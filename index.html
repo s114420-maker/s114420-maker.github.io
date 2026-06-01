@@ -3,187 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>即時聯網資料搜尋站</title>
+    <title>萬能 Google 全網資料搜尋站</title>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            max-width: 700px;
-            margin: 40px auto;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
             padding: 0 20px;
             background-color: #ffffff;
             color: #202124;
         }
         h1 {
             text-align: center;
-            font-size: 28px;
-            margin-bottom: 30px;
-            color: #1a73e8;
+            font-size: 32px;
+            color: #4285f4; /* Google 藍 */
+            margin-bottom: 10px;
         }
-        .search-box {
-            display: flex;
-            border: 1px solid #dfe1e5;
-            border-radius: 24px;
-            overflow: hidden;
-            background: white;
-            box-shadow: 0 1px 6px rgba(32,33,36,0.28);
-            margin-bottom: 30px;
-        }
-        #searchInput {
-            flex: 1;
-            padding: 14px 20px;
-            font-size: 16px;
-            border: none;
-            outline: none;
-        }
-        #searchBtn {
-            padding: 0 25px;
-            font-size: 16px;
-            background-color: #1a73e8;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        #searchBtn:hover {
-            background-color: #1557b0;
-        }
-        .status-msg {
+        .subtitle {
             text-align: center;
             color: #70757a;
-            font-size: 15px;
-            margin-top: 20px;
+            margin-bottom: 40px;
+            font-size: 16px;
         }
-        .result-item {
-            margin-bottom: 25px;
-            animation: fadeIn 0.3s ease-in;
-        }
-        .result-item .site-url {
-            font-size: 12px;
-            color: #202124;
-            margin-bottom: 4px;
-            display: block;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .result-item a.title-link {
-            font-size: 19px;
-            color: #1a0dab;
-            text-decoration: none;
-            display: inline-block;
-            margin-bottom: 4px;
-        }
-        .result-item a.title-link:hover {
-            text-decoration: underline;
-        }
-        .result-item .snippet {
-            font-size: 14px;
-            color: #4d5156;
-            line-height: 1.4;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* 讓搜尋框與結果容器更美觀 */
+        .search-container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
 
-    <h1>萬能關鍵字資料搜尋站</h1>
+    <h1>全網資料搜尋站</h1>
+    <div class="subtitle">輸入關鍵字即可免費獲得 Google 相關資料與連結</div>
     
-    <div class="search-box">
-        <input type="text" id="searchInput" placeholder="請輸入任何你想找的關鍵字...">
-        <button id="searchBtn">搜尋</button>
+    <div class="search-container">
+        <!-- 核心：Google 官方提供的搜尋引擎渲染元件 -->
+        <div class="gcse-search"></div>
     </div>
 
-    <div id="resultsContainer">
-        <div class="status-msg">請在上方輸入關鍵字開始搜尋全網資料。</div>
-    </div>
+    <!-- 載入 Google 官方搜尋引擎控制腳本 -->
+    <script async src="https://google.com"></script>
 
-    <script>
-        async function doSearch() {
-            const query = document.getElementById('searchInput').value.trim();
-            const container = document.getElementById('resultsContainer');
-            
-            if (!query) {
-                container.innerHTML = '<div class="status-msg">❌ 請先輸入關鍵字！</div>';
-                return;
-            }
-
-            container.innerHTML = '<div class="status-msg">⏳ 正在從 Google 搜尋相關資料中，請稍候...</div>';
-
-            try {
-                // 使用免註冊的免費用法呼叫 DuckDuckGo/Google 聚合公共 API
-                const response = await fetch(`https://duckduckgo.com{encodeURIComponent(query)}`);
-                
-                if (!response.ok) throw new Error('網路錯誤');
-                
-                const htmlText = await response.text();
-                
-                // 解析網頁內容並將結果轉化為搜尋列表
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(htmlText, 'text/html');
-                const results = doc.querySelectorAll('.result');
-
-                container.innerHTML = ''; // 清空狀態文字
-
-                if (results.length === 0) {
-                    container.innerHTML = '<div class="status-msg">❌ 找不到相關資料，請換個詞試試看。</div>';
-                    return;
-                }
-
-                // 撈出前 8 筆真實的網路搜尋結果與連結
-                results.forEach((result, index) => {
-                    if (index >= 8) return; 
-
-                    const titleEl = result.querySelector('.result__title a');
-                    const snippetEl = result.querySelector('.result__snippet');
-                    const urlEl = result.querySelector('.result__url');
-
-                    if (titleEl && snippetEl) {
-                        const title = titleEl.innerText;
-                        // 修正有些第三方跳轉連結，確保能直連
-                        let rawUrl = titleEl.getAttribute('href');
-                        if (rawUrl.includes('uddg=')) {
-                            rawUrl = decodeURIComponent(rawUrl.split('uddg=')[1].split('&')[0]);
-                        }
-
-                        const snippet = snippetEl.innerText;
-                        const displayUrl = urlEl ? urlEl.innerText : rawUrl;
-
-                        const itemDiv = document.createElement('div');
-                        itemDiv.className = 'result-item';
-                        itemDiv.innerHTML = `
-                            <span class="site-url">${displayUrl}</span>
-                            <a class="title-link" href="${rawUrl}" target="_blank">${title}</a>
-                            <div class="snippet">${snippet}</div>
-                        `;
-                        container.appendChild(itemDiv);
-                    }
-                });
-
-            } catch (error) {
-                console.error(error);
-                // 萬一背後公共解析失敗的備用方案：引導直接至 Google
-                container.innerHTML = `
-                    <div class="status-msg">
-                        <p>💡 連線較忙碌，已自動為您產生 Google 搜尋直達連結：</p>
-                        <br>
-                        <a href="https://google.com{encodeURIComponent(query)}" target="_blank" style="font-size:18px; color:#1a73e8; font-weight:bold; text-decoration:underline;">
-                            👉 點擊此處直接查看「${query}」的 Google 搜尋結果
-                        </a>
-                    </div>`;
-            }
-        }
-
-        // 綁定按鈕與 Enter 鍵
-        document.getElementById('searchBtn').addEventListener('click', doSearch);
-        document.getElementById('searchInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                doSearch();
-            }
-        });
-    </script>
 </body>
 </html>
+
 
