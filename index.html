@@ -3,43 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>全網資料搜尋站</title>
+    <title>萬能資料搜尋站</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             padding: 30px;
-            background-color: #ffffff;
+            background-color: #f8f9fa;
+            text-align: center;
         }
         h1 {
             color: #1a73e8;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
-        /* 確保輸入框又大又好點擊，絕對不會有點不到無法打字的問題 */
-        #searchInput {
+        /* 表單置中排版 */
+        form {
+            display: inline-block;
             width: 100%;
             max-width: 500px;
-            padding: 15px;
-            font-size: 18px;
+        }
+        /* 確保輸入框在所有裝置上都能流暢點擊打字 */
+        .search-input {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 16px;
             border: 2px solid #ccc;
             border-radius: 4px;
             margin-bottom: 15px;
-            display: block;
             box-sizing: border-box;
+            outline: none;
         }
-        #searchInput:focus {
+        .search-input:focus {
             border-color: #1a73e8;
         }
-        #searchBtn {
+        /* 原生提交按鈕，點擊時會由瀏覽器原生引導，絕不被當成廣告阻擋 */
+        .search-button {
             padding: 12px 30px;
-            font-size: 18px;
+            font-size: 16px;
             background-color: #1a73e8;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            display: block;
+            font-weight: bold;
+            width: 100%;
         }
-        #searchBtn:hover {
+        .search-button:hover {
             background-color: #1557b0;
         }
         .tip {
@@ -53,36 +61,25 @@
 
     <h1>萬能資料搜尋站</h1>
     
-    <!-- 這是標準輸入框，用滑鼠點一下或用手機按一下就能直接打字 -->
-    <input type="text" id="searchInput" placeholder="請點擊此處輸入關鍵字..." autofocus>
-    
-    <button id="searchBtn">搜尋資料</button>
+    <!-- 使用標準原生 Form 表單：直接向 Google 送出請求，繞過所有瀏覽器彈窗封鎖機制 -->
+    <form action="https://google.com" method="GET" target="_blank" onsubmit="return validateForm()">
+        <input type="text" name="q" id="searchInput" class="search-input" placeholder="點擊這裡輸入關鍵字..." autofocus>
+        <button type="submit" class="search-button">搜尋相關資料連結</button>
+    </form>
 
-    <div class="tip">💡 提示：輸入想找的內容後，點擊「搜尋資料」按鈕即可。</div>
+    <div class="tip">💡 提示：輸入內容後點擊按鈕，將透過安全管道為您載入 Google 搜尋結果。</div>
 
     <script>
-        function goSearch() {
-            var inputWord = document.getElementById('searchInput').value.trim();
-            if (inputWord !== '') {
-                // 直接導向並跑出 Google 的相關資料連結
-                var target = 'https://google.com' + encodeURIComponent(inputWord);
-                window.open(target, '_blank');
-            } else {
+        // 防止使用者完全沒輸入任何字就送出
+        function validateForm() {
+            var keyword = document.getElementById('searchInput').value.trim();
+            if (keyword === '') {
                 alert('請先輸入關鍵字！');
+                return false; // 擋下空白提交
             }
+            return true; // 允許正常送出
         }
-
-        // 綁定按鈕點擊事件
-        document.getElementById('searchBtn').addEventListener('click', goSearch);
-        
-        // 綁定鍵盤 Enter 事件
-        document.getElementById('searchInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                goSearch();
-            }
-        });
     </script>
 
 </body>
 </html>
-
