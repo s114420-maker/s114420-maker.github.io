@@ -1,85 +1,298 @@
 <!DOCTYPE html>
-<html lang="zh-Hant-TW">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>萬能資料搜尋站</title>
+    <title>書窗番茄鐘 | Desk Window Pomodoro</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 30px;
-            background-color: #f8f9fa;
-            text-align: center;
+        :root {
+            --bg-color: #ffeaa7;
         }
-        h1 {
-            color: #1a73e8;
-            margin-bottom: 25px;
-        }
-        /* 表單置中排版 */
-        form {
-            display: inline-block;
-            width: 100%;
-            max-width: 500px;
-        }
-        /* 確保輸入框在所有裝置上都能流暢點擊打字 */
-        .search-input {
-            width: 100%;
-            padding: 12px 15px;
-            font-size: 16px;
-            border: 2px solid #ccc;
-            border-radius: 4px;
-            margin-bottom: 15px;
+        * {
             box-sizing: border-box;
-            outline: none;
+            margin: 0;
+            padding: 0;
         }
-        .search-input:focus {
-            border-color: #1a73e8;
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
         }
-        /* 原生提交按鈕，點擊時會由瀏覽器原生引導，絕不被當成廣告阻擋 */
-        .search-button {
-            padding: 12px 30px;
-            font-size: 16px;
-            background-color: #1a73e8;
-            color: white;
+
+        /* 景觀大窗戶（背景） */
+        .window-view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 70%;
+            background: linear-gradient(to bottom, #74b9ff, #a29bfe);
+            transition: background 1s ease;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        /* 書桌 */
+        .desk {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 30%;
+            background: linear-gradient(to bottom, #8a5229, #5c3317);
+            border-top: 12px solid #a0522d;
+            box-shadow: inset 0 10px 20px rgba(0,0,0,0.5);
+            z-index: 5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 窗框與結構 */
+        .window-frame {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 16px solid #4a2711;
+            border-bottom: none;
+            pointer-events: none;
+            z-index: 4;
+        }
+        .window-center-bar {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 100%;
+            background-color: #4a2711;
+            z-index: 4;
+        }
+
+        /* 動態環境效果層 */
+        .effect-layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* 雨景粒子 */
+        .drop {
+            position: absolute;
+            background: linear-gradient(transparent, rgba(255,255,255,0.6));
+            width: 2px;
+            height: 40px;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            0% { transform: translateY(-50px) translateX(0); }
+            100% { transform: translateY(100vh) translateX(-50px); }
+        }
+
+        /* 落葉粒子 */
+        .leaf {
+            position: absolute;
+            width: 15px;
+            height: 10px;
+            background: #e67e22;
+            border-radius: 0 100% 0 100%;
+            animation: drift linear infinite;
+        }
+        @keyframes drift {
+            0% { transform: translateY(-20px) rotate(0deg); left: 10%; }
+            50% { transform: translateY(50vh) rotate(180deg); left: 50%; }
+            100% { transform: translateY(100vh) rotate(360deg); left: 90%; }
+        }
+
+        /* 晴景陽光與雲朵 */
+        .sun {
+            position: absolute;
+            top: 40px;
+            right: 10%;
+            width: 80px;
+            height: 80px;
+            background: #f1c40f;
+            border-radius: 50%;
+            box-shadow: 0 0 40px #f39c12;
+            display: none;
+        }
+        .cloud {
+            position: absolute;
+            background: rgba(255,255,255,0.85);
+            width: 120px;
+            height: 40px;
+            border-radius: 20px;
+            animation: float 25s linear infinite;
+            display: none;
+        }
+        @keyframes float {
+            0% { left: -150px; }
+            100% { left: 100%; }
+        }
+
+        /* 番茄鐘與控制介面（置於書桌上） */
+        .ui-container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.45);
+            padding: 15px 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .timer-display {
+            font-size: 3.5rem;
+            font-weight: bold;
+            font-family: monospace;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+        }
+        .controls button, .scene-select {
+            background: #fff;
             border: none;
-            border-radius: 4px;
+            padding: 8px 16px;
+            margin: 5px;
+            border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
-            width: 100%;
+            color: #333;
+            transition: all 0.2s;
         }
-        .search-button:hover {
-            background-color: #1557b0;
-        }
-        .tip {
-            margin-top: 20px;
-            color: #666;
-            font-size: 14px;
+        .controls button:hover, .scene-select:hover {
+            background: #ffeaa7;
+            transform: scale(1.05);
         }
     </style>
 </head>
 <body>
 
-    <h1>萬能資料搜尋站</h1>
-    
-    <!-- 使用標準原生 Form 表單：直接向 Google 送出請求，繞過所有瀏覽器彈窗封鎖機制 -->
-    <form action="https://google.com" method="GET" target="_blank" onsubmit="return validateForm()">
-        <input type="text" name="q" id="searchInput" class="search-input" placeholder="點擊這裡輸入關鍵字..." autofocus>
-        <button type="submit" class="search-button">搜尋相關資料連結</button>
-    </form>
+    <!-- 窗外景色 -->
+    <div class="window-view" id="windowView">
+        <div class="sun" id="sun"></div>
+        <div class="effect-layer" id="effectLayer"></div>
+        <div class="window-center-bar"></div>
+        <div class="window-frame"></div>
+    </div>
 
-    <div class="tip">💡 提示：輸入內容後點擊按鈕，將透過安全管道為您載入 Google 搜尋結果。</div>
+    <!-- 室內書桌與番茄鐘 -->
+    <div class="desk">
+        <div class="ui-container">
+            <!-- 景觀切換 -->
+            <select class="scene-select" id="sceneSelector" onchange="changeScene()">
+                <option value="rain">🌧 窗外雨景 (配：雷雨聲)</option>
+                <option value="leaves">🍁 窗外落葉 (配：秋風沙沙聲)</option>
+                <option value="sunny">☀️ 窗外晴景 (配：夏日鳥鳴聲)</option>
+            </select>
+
+            <!-- 時間顯示 -->
+            <div class="timer-display" id="timer">25:00</div>
+
+            <!-- 計時控制 -->
+            <div class="controls">
+                <button id="startBtn" onclick="toggleTimer()">開始</button>
+                <button onclick="resetTimer()">重設</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 免版權白噪音（如網址失效，將自動啟用預備的網頁音效產生器） -->
+    <audio id="audio-rain" loop src="https://mixkit.co"></audio>
+    <audio id="audio-leaves" loop src="https://mixkit.co"></audio>
+    <audio id="audio-sunny" loop src="https://mixkit.co"></audio>
 
     <script>
-        // 防止使用者完全沒輸入任何字就送出
-        function validateForm() {
-            var keyword = document.getElementById('searchInput').value.trim();
-            if (keyword === '') {
-                alert('請先輸入關鍵字！');
-                return false; // 擋下空白提交
-            }
-            return true; // 允許正常送出
-        }
-    </script>
+        // --- 番茄鐘邏輯 ---
+        let timeLeft = 25 * 60;
+        let timerId = null;
+        let isRunning = false;
 
-</body>
-</html>
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const seconds = (timeLeft % 60).toString().padStart(2, '0');
+            document.getElementById('timer').textContent = `${minutes}:${seconds}`;
+        }
+
+        function toggleTimer() {
+            if (isRunning) {
+                clearInterval(timerId);
+                document.getElementById('startBtn').textContent = '開始';
+                stopAllAudio();
+            } else {
+                timerId = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateTimerDisplay();
+                    } else {
+                        clearInterval(timerId);
+                        alert('時間到！休息一下吧！');
+                        resetTimer();
+                    }
+                }, 1000);
+                document.getElementById('startBtn').textContent = '暫停';
+                playCurrentAudio();
+            }
+            isRunning = !isRunning;
+        }
+
+        function resetTimer() {
+            clearInterval(timerId);
+            timeLeft = 25 * 60;
+            isRunning = false;
+            document.getElementById('startBtn').textContent = '開始';
+            updateTimerDisplay();
+            stopAllAudio();
+        }
+
+        // --- 景觀與音效邏輯 ---
+        const windowView = document.getElementById('windowView');
+        const effectLayer = document.getElementById('effectLayer');
+        const sun = document.getElementById('sun');
+        const selector = document.getElementById('sceneSelector');
+
+        function changeScene() {
+            const scene = selector.value;
+            effectLayer.innerHTML = ''; // 清空上一場景粒子
+            sun.style.display = 'none';
+
+            if (scene === 'rain') {
+                windowView.style.background = 'linear-gradient(to bottom, #2c3e50, #0f171e)';
+                // 產生雨滴
+                for (let i = 0; i < 60; i++) {
+                    let drop = document.createElement('div');
+                    drop.className = 'drop';
+                    drop.style.left = Math.random() * 100 + '%';
+                    drop.style.top = Math.random() * -50 + 'px';
+                    drop.style.animationDuration = (0.5 + Math.random() * 0.5) + 's';
+                    drop.style.animationDelay = Math.random() * 2 + 's';
+                    effectLayer.appendChild(drop);
+                }
+            } 
+            else if (scene === 'leaves') {
+                windowView.style.background = 'linear-gradient(to bottom, #d35400, #2c3e50)';
+                // 產生落葉
+                for (let i = 0; i < 15; i++) {
+                    let leaf = document.createElement('div');
+                    leaf.className = 'leaf';
+                    leaf.style.left = Math.random() * 100 + '%';
+                    leaf.style.animationDuration = (4 + Math.random() * 4) + 's';
+                    leaf.style.animationDelay = Math.random() * 5 + 's';
+                    leaf.style.background = `rgb(${200 + Math.random()*55}, ${100 + Math.random()*50}, 30)`;
+                    effectLayer.appendChild(leaf);
+                }
+            } 
+            else if (scene === 'sunny') {
+                windowView.style.background = 'linear-gradient(to bottom, #74b9ff, #e17055)';
+                sun.style.display = 'block';
+                // 產生白雲
+                for (let i = 0; i < 3; i++) {
+                    let cloud = document.createElement('div');
