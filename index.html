@@ -3,152 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>關鍵字資料搜尋站</title>
+    <title>Google 快捷搜尋站</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             max-width: 600px;
-            margin: 50px auto;
+            margin: 100px auto;
             padding: 20px;
             background-color: #f9f9f9;
+            text-align: center;
         }
         h1 {
-            text-align: center;
-            color: #333;
+            color: #202124;
+            font-size: 32px;
+            margin-bottom: 30px;
         }
         .search-box {
             display: flex;
-            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 1px solid #dfe1e5;
+            border-radius: 24px;
+            overflow: hidden;
+            background: white;
+        }
+        .search-box:hover {
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
         #searchInput {
             flex: 1;
-            padding: 10px;
+            padding: 15px 20px;
             font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px 0 0 4px;
+            border: none;
             outline: none;
         }
         #searchBtn {
-            padding: 10px 20px;
+            padding: 0 25px;
             font-size: 16px;
-            background-color: #007bff;
-            color: white;
+            background-color: #f8f9fa;
+            color: #3c4043;
             border: none;
-            border-radius: 0 4px 4px 0;
             cursor: pointer;
+            border-left: 1px solid #dfe1e5;
+            transition: background 0.2s;
         }
         #searchBtn:hover {
-            background-color: #0056b3;
-        }
-        .result-item {
-            background: white;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .result-item a {
-            font-size: 18px;
-            color: #007bff;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .result-item a:hover {
-            text-decoration: underline;
-        }
-        .result-item p {
-            margin: 5px 0 0 0;
-            color: #666;
-            font-size: 14px;
-        }
-        .no-result {
-            text-align: center;
-            color: #999;
-            margin-top: 20px;
+            background-color: #f1f3f4;
         }
     </style>
 </head>
 <body>
 
-    <h1>資料庫搜尋站</h1>
+    <h1>Google 資料搜尋站</h1>
     
     <div class="search-box">
-        <input type="text" id="searchInput" placeholder="請輸入關鍵字搜尋...">
-        <button id="searchBtn">搜尋</button>
+        <input type="text" id="searchInput" placeholder="請輸入關鍵字，將為您導向 Google 搜尋...">
+        <button id="searchBtn">Google 搜尋</button>
     </div>
 
-    <div id="resultsContainer"></div>
-
     <script>
-        // 1. 在這裡自由修改、新增或刪除你的網站資料庫內容
-        const database = [
-            {
-                title: "Google 搜尋引擎",
-                keywords: "google 搜尋 引擎 網頁 尋找 大神",
-                url: "https://www.google.com",
-                description: "全球最大的網頁搜尋引擎，可以幫你找到各種網路資訊。"
-            },
-            {
-                title: "GitHub 官方網站",
-                keywords: "github 程式 碼 專案 託管 開源 git",
-                url: "https://github.com",
-                description: "軟體專案代碼託管平台，也是目前你託管這個網頁的地方。"
-            },
-            {
-                title: "維基百科中文網",
-                keywords: "wikipedia 維基 百科 知識 百科全書 查詢",
-                url: "https://wikipedia.org",
-                description: "自由的線上百科全書，任何人都可以協同編輯的知識庫。"
-            },
-            {
-                title: "YouTube 影片平台",
-                keywords: "youtube 影片 影片 觀看 娛樂 音樂 學習",
-                url: "https://www.youtube.com",
-                description: "全球最大的影片分享平台，包含豐富的影音與直播內容。"
-            }
-        ];
-
-        // 執行搜尋的函式
-        function performSearch() {
-            const query = document.getElementById('searchInput').value.trim().toLowerCase();
-            const container = document.getElementById('resultsContainer');
-            container.innerHTML = ''; // 清空舊的搜尋結果
-
-            if (query === '') {
-                container.innerHTML = '<div class="no-result">請輸入關鍵字進行搜尋</div>';
-                return;
-            }
-
-            // 過濾符合關鍵字或標題的資料
-            const filteredResults = database.filter(item => {
-                return item.title.toLowerCase().includes(query) || 
-                       item.keywords.toLowerCase().includes(query) ||
-                       item.description.toLowerCase().includes(query);
-            });
-
-            // 顯示結果
-            if (filteredResults.length === 0) {
-                container.innerHTML = '<div class="no-result">找不到相關資料，請換個關鍵字試試。</div>';
+        function redirectToGoogle() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (query !== '') {
+                // 自動將關鍵字帶入 Google 搜尋網址，並在新分頁打開
+                const googleUrl = `https://google.com{encodeURIComponent(query)}`;
+                window.open(googleUrl, '_blank');
             } else {
-                filteredResults.forEach(item => {
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'result-item';
-                    itemDiv.innerHTML = `
-                        <a href="${item.url}" target="_blank">${item.title}</a>
-                        <p>${item.description}</p>
-                    `;
-                    container.appendChild(itemDiv);
-                });
+                alert('請先輸入關鍵字！');
             }
         }
 
-        // 綁定點擊按鈕與按下 Enter 鍵的事件
-        document.getElementById('searchBtn').addEventListener('click', performSearch);
+        // 綁定按鈕點擊與 Enter 鍵
+        document.getElementById('searchBtn').addEventListener('click', redirectToGoogle);
         document.getElementById('searchInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
-                performSearch();
+                redirectToGoogle();
             }
         });
     </script>
 </body>
 </html>
+
