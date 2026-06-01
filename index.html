@@ -3,201 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>書窗番茄鐘 | Desk Window Pomodoro</title>
+    <title>精緻全景窗台番茄鐘</title>
     <style>
-        :root {
-            --bg-color: #ffeaa7;
-        }
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body, html {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html { width: 100%; height: 100%; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #111; }
 
-        /* 景觀大窗戶（背景） */
+        /* --- 景觀大窗戶（背景層） --- */
         .window-view {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 70%;
-            background: linear-gradient(to bottom, #74b9ff, #a29bfe);
-            transition: background 1s ease;
-            z-index: 1;
-            overflow: hidden;
+            top: 0; left: 0; width: 100%; height: 75%;
+            transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1; overflow: hidden;
         }
 
-        /* 書桌 */
-        .desk {
+        /* --- 超精緻窗框與環境光 --- */
+        .window-frame-container {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 30%;
-            background: linear-gradient(to bottom, #8a5229, #5c3317);
-            border-top: 12px solid #a0522d;
-            box-shadow: inset 0 10px 20px rgba(0,0,0,0.5);
+            top: 0; left: 0; width: 100%; height: 100%;
+            border: 24px solid #23120b; /* 厚實木窗框 */
+            border-bottom: 8px solid #23120b;
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.8);
+            pointer-events: none; z-index: 4;
+        }
+        .window-grid {
+            position: absolute;
+            top: 0; left: 50%; transform: translateX(-50%);
+            width: 16px; height: 100%;
+            background: linear-gradient(90deg, #1d0e08, #2d1910, #1d0e08);
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+            z-index: 4;
+        }
+
+        /* --- 擬真室內書桌窗台 --- */
+        .desk-ledge {
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 25%;
+            background: linear-gradient(to bottom, #3d1f11 0%, #2c140a 10%, #1a0a04 100%);
+            border-top: 14px solid #4a2716; /* 窗台邊緣木緣 */
+            box-shadow: 0 -10px 50px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.1);
             z-index: 5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: flex; justify-content: center; align-items: center;
         }
 
-        /* 窗框與結構 */
-        .window-frame {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: 16px solid #4a2711;
-            border-bottom: none;
-            pointer-events: none;
-            z-index: 4;
+        /* --- 特效粒子層 --- */
+        .effect-layer { position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: 2; }
+
+        /* 1. 雨景細節 */
+        .rain-drop {
+            position: absolute; background: linear-gradient(transparent, rgba(230, 244, 255, 0.8));
+            width: 1.5px; height: 55px; opacity: 0.7; animation: fast-fall linear infinite;
         }
-        .window-center-bar {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 12px;
-            height: 100%;
-            background-color: #4a2711;
-            z-index: 4;
+        .splash {
+            position: absolute; border: 1px solid rgba(255,255,255,0.4); border-radius: 50%;
+            animation: splash-fade 0.4s ease-out forwards; transform: scale(0);
+        }
+        @keyframes fast-fall {
+            0% { transform: translateY(-60px) rotate(15deg); }
+            100% { transform: translateY(75vh) rotate(15deg); }
+        }
+        @keyframes splash-fade {
+            0% { transform: scale(0); opacity: 0.8; }
+            100% { transform: scale(1.5); opacity: 0; }
         }
 
-        /* 動態環境效果層 */
-        .effect-layer {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            z-index: 2;
+        /* 2. 落葉細節 */
+        .fall-leaf {
+            position: absolute; width: 22px; height: 14px;
+            border-radius: 3px 18px 3px 18px;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+            animation: organic-drift linear infinite; transform-style: preserve-3d;
+        }
+        @keyframes organic-drift {
+            0% { transform: translateY(-20px) rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+            50% { transform: translateY(37vh) rotateX(180deg) rotateY(90deg) rotateZ(45deg); }
+            100% { transform: translateY(75vh) rotateX(360deg) rotateY(180deg) rotateZ(90deg); }
         }
 
-        /* 雨景粒子 */
-        .drop {
-            position: absolute;
-            background: linear-gradient(transparent, rgba(255,255,255,0.6));
-            width: 2px;
-            height: 40px;
-            animation: fall linear infinite;
+        /* 3. 晴景天色細節 */
+        .sun-glow {
+            position: absolute; top: 10%; right: 15%; width: 140px; height: 140px;
+            background: radial-gradient(circle, #fff 10%, #fffae6 40%, rgba(255,230,120,0.3) 70%, transparent 100%);
+            border-radius: 50%; filter: blur(5px); animation: sun-pulse 8s ease-in-out infinite alternate;
         }
-        @keyframes fall {
-            0% { transform: translateY(-50px) translateX(0); }
-            100% { transform: translateY(100vh) translateX(-50px); }
+        .cloud-lux {
+            position: absolute; background: linear-gradient(to bottom, #ffffff 0%, #f0f4f8 100%);
+            width: 180px; height: 55px; border-radius: 30px; filter: blur(2px);
+            opacity: 0.4; animation: majestic-float 45s linear infinite;
         }
+        @keyframes sun-pulse { 0% { transform: scale(0.95); opacity: 0.9; } 100% { transform: scale(1.05); opacity: 1; } }
+        @keyframes majestic-float { 0% { transform: translateX(-200px); } 100% { transform: translateX(105vw); } }
 
-        /* 落葉粒子 */
-        .leaf {
-            position: absolute;
-            width: 15px;
-            height: 10px;
-            background: #e67e22;
-            border-radius: 0 100% 0 100%;
-            animation: drift linear infinite;
-        }
-        @keyframes drift {
-            0% { transform: translateY(-20px) rotate(0deg); left: 10%; }
-            50% { transform: translateY(50vh) rotate(180deg); left: 50%; }
-            100% { transform: translateY(100vh) rotate(360deg); left: 90%; }
-        }
-
-        /* 晴景陽光與雲朵 */
-        .sun {
-            position: absolute;
-            top: 40px;
-            right: 10%;
-            width: 80px;
-            height: 80px;
-            background: #f1c40f;
-            border-radius: 50%;
-            box-shadow: 0 0 40px #f39c12;
-            display: none;
-        }
-        .cloud {
-            position: absolute;
-            background: rgba(255,255,255,0.85);
-            width: 120px;
-            height: 40px;
-            border-radius: 20px;
-            animation: float 25s linear infinite;
-            display: none;
-        }
-        @keyframes float {
-            0% { left: -150px; }
-            100% { left: 100%; }
-        }
-
-        /* 番茄鐘與控制介面（置於書桌上） */
-        .ui-container {
-            position: relative;
-            z-index: 10;
-            text-align: center;
-            color: #fff;
-            background: rgba(0, 0, 0, 0.45);
-            padding: 15px 30px;
-            border-radius: 15px;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        /* --- 質感玻璃擬物介面 --- */
+        .pomodoro-ui {
+            position: relative; z-index: 10; text-align: center;
+            background: rgba(15, 10, 8, 0.75);
+            padding: 20px 40px; border-radius: 20px;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255,255,255,0.1);
         }
         .timer-display {
-            font-size: 3.5rem;
-            font-weight: bold;
-            font-family: monospace;
-            margin-bottom: 5px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+            font-size: 4rem; font-weight: 700; font-family: 'Courier New', monospace;
+            color: #f5f6fa; letter-spacing: 2px; margin-bottom: 10px;
+            text-shadow: 0 0 12px rgba(255,255,255,0.2);
         }
         .controls button, .scene-select {
-            background: #fff;
-            border: none;
-            padding: 8px 16px;
-            margin: 5px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            color: #333;
-            transition: all 0.2s;
+            background: linear-gradient(to bottom, #4a2d1b, #331d10);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 10px 22px; margin: 6px; border-radius: 8px;
+            cursor: pointer; font-weight: 600; color: #f3e9dc;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: all 0.2s ease;
         }
         .controls button:hover, .scene-select:hover {
-            background: #ffeaa7;
-            transform: scale(1.05);
+            background: linear-gradient(to bottom, #5c3a25, #422717);
+            transform: translateY(-1px); box-shadow: 0 6px 12px rgba(0,0,0,0.4);
         }
+        .controls button:active { transform: translateY(1px); }
     </style>
 </head>
 <body>
 
-    <!-- 窗外景色 -->
+    <!-- 戶外美景 -->
     <div class="window-view" id="windowView">
-        <div class="sun" id="sun"></div>
+        <div class="sun-glow" id="sunGlow"></div>
         <div class="effect-layer" id="effectLayer"></div>
-        <div class="window-center-bar"></div>
-        <div class="window-frame"></div>
+        <div class="window-grid"></div>
+        <div class="window-frame-container"></div>
     </div>
 
-    <!-- 室內書桌與番茄鐘 -->
-    <div class="desk">
-        <div class="ui-container">
-            <!-- 景觀切換 -->
+    <!-- 書桌與番茄鐘 -->
+    <div class="desk-ledge">
+        <div class="pomodoro-ui">
             <select class="scene-select" id="sceneSelector" onchange="changeScene()">
-                <option value="rain">🌧 窗外雨景 (配：雷雨聲)</option>
-                <option value="leaves">🍁 窗外落葉 (配：秋風沙沙聲)</option>
-                <option value="sunny">☀️ 窗外晴景 (配：夏日鳥鳴聲)</option>
+                <option value="rain">🌧 寂靜深夜窗雨 (雷雨聲)</option>
+                <option value="leaves">🍁 暮色深秋楓紅 (落葉風聲)</option>
+                <option value="sunny">☀️ 盛夏微光清晨 (鳥鳴晨音)</option>
             </select>
 
-            <!-- 時間顯示 -->
             <div class="timer-display" id="timer">25:00</div>
 
-            <!-- 計時控制 -->
             <div class="controls">
                 <button id="startBtn" onclick="toggleTimer()">開始</button>
                 <button onclick="resetTimer()">重設</button>
@@ -205,13 +149,12 @@
         </div>
     </div>
 
-    <!-- 免版權白噪音（如網址失效，將自動啟用預備的網頁音效產生器） -->
+    <!-- 備用高效白噪音來源 -->
     <audio id="audio-rain" loop src="https://mixkit.co"></audio>
     <audio id="audio-leaves" loop src="https://mixkit.co"></audio>
     <audio id="audio-sunny" loop src="https://mixkit.co"></audio>
 
     <script>
-        // --- 番茄鐘邏輯 ---
         let timeLeft = 25 * 60;
         let timerId = null;
         let isRunning = false;
@@ -222,26 +165,33 @@
             document.getElementById('timer').textContent = `${minutes}:${seconds}`;
         }
 
+        // 核心修正：分開控制「計時邏輯」與「音訊播放」，防止瀏覽器安全性阻擋導致程式當機
         function toggleTimer() {
             if (isRunning) {
+                // 暫停計時
                 clearInterval(timerId);
                 document.getElementById('startBtn').textContent = '開始';
                 stopAllAudio();
+                isRunning = false;
             } else {
+                // 開始計時
+                isRunning = true;
+                document.getElementById('startBtn').textContent = '暫停';
+                
                 timerId = setInterval(() => {
                     if (timeLeft > 0) {
                         timeLeft--;
                         updateTimerDisplay();
                     } else {
                         clearInterval(timerId);
-                        alert('時間到！休息一下吧！');
+                        alert('專注時間結束！放鬆一下眼睛看窗外吧。');
                         resetTimer();
                     }
                 }, 1000);
-                document.getElementById('startBtn').textContent = '暫停';
+
+                // 嘗試播放音訊，被阻擋也不會卡死計時器
                 playCurrentAudio();
             }
-            isRunning = !isRunning;
         }
 
         function resetTimer() {
@@ -253,46 +203,32 @@
             stopAllAudio();
         }
 
-        // --- 景觀與音效邏輯 ---
         const windowView = document.getElementById('windowView');
         const effectLayer = document.getElementById('effectLayer');
-        const sun = document.getElementById('sun');
+        const sunGlow = document.getElementById('sunGlow');
         const selector = document.getElementById('sceneSelector');
 
         function changeScene() {
             const scene = selector.value;
-            effectLayer.innerHTML = ''; // 清空上一場景粒子
-            sun.style.display = 'none';
+            effectLayer.innerHTML = ''; 
+            sunGlow.style.display = 'none';
 
             if (scene === 'rain') {
-                windowView.style.background = 'linear-gradient(to bottom, #2c3e50, #0f171e)';
-                // 產生雨滴
-                for (let i = 0; i < 60; i++) {
+                // 精緻雨夜：層次極深的極光暗藍與黑
+                windowView.style.background = 'radial-gradient(circle at 50% 30%, #1a2536 0%, #0d131a 70%, #05080c 100%)';
+                
+                // 密集雨滴與隨機窗台落點漣漪
+                for (let i = 0; i < 70; i++) {
                     let drop = document.createElement('div');
-                    drop.className = 'drop';
+                    drop.className = 'rain-drop';
                     drop.style.left = Math.random() * 100 + '%';
-                    drop.style.top = Math.random() * -50 + 'px';
-                    drop.style.animationDuration = (0.5 + Math.random() * 0.5) + 's';
+                    drop.style.top = (Math.random() * -100) + 'px';
+                    drop.style.animationDuration = (0.4 + Math.random() * 0.4) + 's';
                     drop.style.animationDelay = Math.random() * 2 + 's';
                     effectLayer.appendChild(drop);
                 }
             } 
             else if (scene === 'leaves') {
-                windowView.style.background = 'linear-gradient(to bottom, #d35400, #2c3e50)';
-                // 產生落葉
-                for (let i = 0; i < 15; i++) {
-                    let leaf = document.createElement('div');
-                    leaf.className = 'leaf';
-                    leaf.style.left = Math.random() * 100 + '%';
-                    leaf.style.animationDuration = (4 + Math.random() * 4) + 's';
-                    leaf.style.animationDelay = Math.random() * 5 + 's';
-                    leaf.style.background = `rgb(${200 + Math.random()*55}, ${100 + Math.random()*50}, 30)`;
-                    effectLayer.appendChild(leaf);
-                }
-            } 
-            else if (scene === 'sunny') {
-                windowView.style.background = 'linear-gradient(to bottom, #74b9ff, #e17055)';
-                sun.style.display = 'block';
-                // 產生白雲
-                for (let i = 0; i < 3; i++) {
-                    let cloud = document.createElement('div');
+                // 精緻秋暮：黃昏紫金色霞光
+                windowView.style.background = 'linear-gradient(135deg, #b04613 0%, #632c1c 40%, #23161c 100%)';
+                
