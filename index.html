@@ -3,36 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>1028 </title>
+    <title>1028 時尚美妝接接樂</title>
     <style>
         body {
             margin: 0;
             padding: 0;
-            background: #ffe3e8; /* 1028經典粉色系背景 */
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #ffe3e8;
+            font-family: Arial, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            overflow: hidden;
         }
 
         h1 {
             color: #d15b72;
-            margin: 10px 0 5px 0;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            margin: 10px 0;
         }
 
-        /* 圖片自訂控制區 */
         .upload-panel {
             background: white;
-            padding: 10px 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
             display: flex;
-            gap: 15px;
+            gap: 10px;
             z-index: 10;
         }
 
@@ -40,29 +36,20 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-size: 13px;
-            color: #555;
-        }
-
-        .upload-group input {
-            margin-top: 5px;
             font-size: 12px;
-            max-width: 160px;
         }
 
-        /* 遊戲畫布容器 */
         #game-container {
             position: relative;
-            width: 400px;
-            height: 500px;
-            background: linear-gradient(to bottom, #ffffff, #fff0f2);
+            width: 360px;
+            height: 460px;
+            background: #fff0f2;
             border: 4px solid #d15b72;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-radius: 15px;
             overflow: hidden;
+            touch-action: none; /* 防止手機瀏覽器震動或上下捲動 */
         }
 
-        /* 遊戲計分板與狀態 */
         .ui-layer {
             position: absolute;
             top: 10px;
@@ -70,36 +57,30 @@
             right: 10px;
             display: flex;
             justify-content: space-between;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             color: #d15b72;
             pointer-events: none;
             z-index: 5;
         }
 
-        /* 玩家接取器 */
         #player {
             position: absolute;
             bottom: 20px;
-            left: 160px;
+            left: 140px;
             width: 80px;
             height: 40px;
             background-color: #e87a90;
             background-size: cover;
             background-position: center;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 14px;
-            text-align: center;
         }
 
-        /* 掉落物樣式 */
         .falling-item {
             position: absolute;
             width: 40px;
@@ -108,7 +89,6 @@
             background-size: cover;
             background-position: center;
             border-radius: 50%;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -117,7 +97,6 @@
             font-weight: bold;
         }
 
-        /* 遊戲結束蓋板 */
         #game-over-screen {
             position: absolute;
             top: 0;
@@ -134,192 +113,194 @@
             display: none;
         }
 
-        #game-over-screen h2 {
-            font-size: 32px;
-            margin-bottom: 10px;
-        }
-
         #restart-btn {
-            padding: 10px 25px;
-            font-size: 16px;
+            padding: 10px 20px;
             background: white;
             color: #d15b72;
             border: none;
-            border-radius: 25px;
+            border-radius: 20px;
             cursor: pointer;
             font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            transition: 0.2s;
-        }
-
-        #restart-btn:hover {
-            transform: scale(1.05);
-            background: #fff0f2;
-        }
-
-        /* 說明 */
-        .instructions {
-            margin-top: 15px;
-            font-size: 14px;
-            color: #888;
-            text-align: center;
-            line-height: 1.5;
         }
     </style>
 </head>
 <body>
 
-    <h1>1028 時尚美妝接接樂</h1>
+    <h1>1028 接接樂</h1>
 
-    <!-- 圖片自訂面板 -->
     <div class="upload-panel">
         <div class="upload-group">
-            <label for="player-img-input"><b>換玩家圖片 (下方盒子)</b></label>
+            <label><b>換玩家圖</b></label>
             <input type="file" id="player-img-input" accept="image/*">
         </div>
         <div class="upload-group">
-            <label for="item-img-input"><b>換掉落物圖片 (彩妝品)</b></label>
+            <label><b>換掉落物圖</b></label>
             <input type="file" id="item-img-input" accept="image/*">
         </div>
     </div>
 
-    <!-- 遊戲主體 -->
     <div id="game-container">
         <div class="ui-layer">
             <div id="score-board">得分: 0</div>
             <div id="lives-board">生命值: ❤️❤️❤️</div>
         </div>
-
-        <!-- 玩家接取框 -->
         <div id="player">1028</div>
-
-        <!-- 遊戲結束畫面 -->
         <div id="game-over-screen">
             <h2>遊戲結束</h2>
-            <p id="final-score" style="font-size: 20px; margin-bottom: 20px;">最終得分: 0</p>
+            <p id="final-score">最終得分: 0</p>
             <button id="restart-btn" onclick="resetGame()">重新開始</button>
         </div>
     </div>
 
-    <div class="instructions">
-        電腦：左右方向鍵 ◀ ▶ 或滑鼠拖曳移動<br>
-        手機：用手指直接拖曳下方粉色方塊移動
-    </div>
-
     <script>
-        // 獲取 DOM 元素
         const container = document.getElementById('game-container');
         const player = document.getElementById('player');
         const scoreBoard = document.getElementById('score-board');
         const livesBoard = document.getElementById('lives-board');
         const gameOverScreen = document.getElementById('game-over-screen');
         const finalScoreText = document.getElementById('final-score');
-        
-        // 圖片上傳 Input
         const playerImgInput = document.getElementById('player-img-input');
         const itemImgInput = document.getElementById('item-img-input');
 
-        // 儲存上傳圖片的 Base64 數據
         let customPlayerImg = "";
         let customItemImg = "";
-
-        // 遊戲核心變數設定
-        const containerWidth = 400;
-        const containerHeight = 500;
-        let playerWidth = 80;
-        let playerX = 160; // 初始居中位置
+        const containerWidth = 360;
+        const playerWidth = 80;
+        let playerX = 140;
         let score = 0;
         let lives = 3;
         let isGameOver = false;
         let fallingItems = [];
         let gameLoopId;
         let spawnTimerId;
-        let fallSpeed = 3; // 初始掉落速度
-        let spawnInterval = 1200; // 產生掉落物的時間間隔(毫秒)
+        let fallSpeed = 3;
 
-        // 監聽玩家圖片更換
-        playerImgInput.addEventListener('change', function(e) {
+        // 圖片變更監聽
+        playerImgInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(event) {
+                reader.onload = (event) => {
                     customPlayerImg = event.target.result;
                     player.style.backgroundImage = `url('${customPlayerImg}')`;
-                    player.textContent = ""; // 有圖就清除文字
+                    player.textContent = "";
                 };
                 reader.readAsDataURL(file);
             }
         });
 
-        // 監聽掉落物圖片更換
-        itemImgInput.addEventListener('change', function(e) {
+        itemImgInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(event) {
-                    customItemImg = event.target.result;
-                };
+                reader.onload = (event) => { customItemImg = event.target.result; };
                 reader.readAsDataURL(file);
             }
         });
 
-        // --- 控制邏輯：鍵盤事件 ---
+        // 玩家位置更新
+        function setPlayerX(x) {
+            let targetX = x - (playerWidth / 2);
+            if (targetX < 0) targetX = 0;
+            if (targetX > containerWidth - playerWidth) targetX = containerWidth - playerWidth;
+            playerX = targetX;
+            player.style.left = playerX + 'px';
+        }
+
+        // 鍵盤控制 (左右方向鍵 或 A、D 鍵)
         document.addEventListener('keydown', (e) => {
             if (isGameOver) return;
-            if (e.key === 'ArrowLeft') {
-                movePlayer(-25);
-            } else if (e.key === 'ArrowRight') {
-                movePlayer(25);
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+                setPlayerX(playerX + (playerWidth/2) - 25);
+            } else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+                setPlayerX(playerX + (playerWidth/2) + 25);
             }
         });
 
-        // --- 控制邏輯：滑鼠與觸控拖曳 ---
-        let isDragging = false;
-        
-        function handleMove(clientX) {
+        // 點擊與觸控控制 (直接抓取位置，防止拖曳卡死)
+        function handleInteraction(e) {
             if (isGameOver) return;
             const rect = container.getBoundingClientRect();
-            // 計算滑鼠/手指在遊戲容器內的相對位置，並將中心點與物件對齊
-            let newX = clientX - rect.left - (playerWidth / 2);
-            // 邊界限制
-            if (newX < 0) newX = 0;
-            if (newX > containerWidth - playerWidth) newX = containerWidth - playerWidth;
-            
-            playerX = newX;
-            player.style.left = playerX + 'px';
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const relativeX = clientX - rect.left;
+            setPlayerX(relativeX);
         }
 
-        container.addEventListener('mousedown', (e) => { isDragging = true; handleMove(e.clientX); });
-        container.addEventListener('mousemove', (e) => { if (isDragging) handleMove(e.clientX); });
-        window.addEventListener('mouseup', () => { isDragging = false; });
+        container.addEventListener('mousedown', handleInteraction);
+        container.addEventListener('mousemove', (e) => { if(e.buttons === 1) handleInteraction(e); });
+        container.addEventListener('touchstart', handleInteraction, {passive: true});
+        container.addEventListener('touchmove', handleInteraction, {passive: true});
 
-        // 支援手機觸控
-        container.addEventListener('touchstart', (e) => { isDragging = true; handleMove(e.touches[0].clientX); });
-        container.addEventListener('touchmove', (e) => { if (isDragging) handleMove(e.touches[0].clientX); e.preventDefault(); }, { passive: false });
-        window.addEventListener('touchend', () => { isDragging = false; });
-
-
-        function movePlayer(amount) {
-            playerX += amount;
-            if (playerX < 0) playerX = 0;
-            if (playerX > containerWidth - playerWidth) playerX = containerWidth - playerWidth;
-            player.style.left = playerX + 'px';
-        }
-
-        // --- 遊戲運作邏輯 ---
-
-        // 製造掉落物
+        // 生成掉落物
         function spawnItem() {
             if (isGameOver) return;
-
             const item = document.createElement('div');
             item.classList.add('falling-item');
-            
-            // 隨機生成 X 軸位置
             const itemX = Math.floor(Math.random() * (containerWidth - 40));
             item.style.left = itemX + 'px';
             item.style.top = '0px';
 
-            // 判斷套用外觀
             if (customItemImg) {
                 item.style.backgroundImage = `url('${customItemImg}')`;
+                item.style.backgroundColor = "transparent";
+            } else {
+                item.textContent = "1028";
+            }
+
+            container.appendChild(item);
+            fallingItems.push({ element: item, x: itemX, y: 0 });
+            fallSpeed = 3 + Math.floor(score / 50);
+        }
+
+        // 遊戲核心循環
+        function updateGame() {
+            if (isGameOver) return;
+
+            for (let i = fallingItems.length - 1; i >= 0; i--) {
+                let item = fallingItems[i];
+                item.y += fallSpeed;
+                item.element.style.top = item.y + 'px';
+
+                // 碰撞檢測 (接物偵測)
+                if (item.y >= 380 && item.y <= 410) {
+                    if (item.x + 40 >= playerX && item.x <= playerX + playerWidth) {
+                        score += 10;
+                        scoreBoard.textContent = "得分: " + score;
+                        item.element.remove();
+                        fallingItems.splice(i, 1);
+                        continue;
+                    }
+                }
+
+                // 漏接偵測
+                if (item.y > 460) {
+                    lives--;
+                    let hearts = "";
+                    for(let j=0; j<3; j++) hearts += j < lives ? "❤️" : "🖤";
+                    livesBoard.textContent = "生命值: " + hearts;
+                    
+                    item.element.remove();
+                    fallingItems.splice(i, 1);
+
+                    if (lives <= 0) {
+                        isGameOver = true;
+                        cancelAnimationFrame(gameLoopId);
+                        clearInterval(spawnTimerId);
+                        finalScoreText.textContent = "最終得分: " + score;
+                        gameOverScreen.style.display = 'flex';
+                        break;
+                    }
+                }
+            }
+            if (!isGameOver) gameLoopId = requestAnimationFrame(updateGame);
+        }
+
+        function resetGame() {
+            fallingItems.forEach(item => item.element.remove());
+            fallingItems = [];
+            score = 0;
+            lives = 3;
+            fallSpeed = 3;
+            isGameOver = false;
+            scoreBoard.textContent = "得分: 0";
+            livesBoard.textContent = "生命值: ❤️❤️❤️";
