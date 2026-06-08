@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4096 自訂圖片版經典遊戲</title>
+    <title>4096 經典滑塊遊戲 - 自訂背景版</title>
     <style>
         body {
             margin: 0;
             padding: 0;
             background: #faf8ef;
-            font-family: "Clear Sans", "Helvetica Neue", Arial, sans-serif;
+            font-family: "Clear Sans", Arial, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -19,52 +19,38 @@
 
         h1 {
             color: #776e65;
-            font-size: 40px;
+            font-size: 36px;
             margin: 10px 0 5px 0;
         }
 
-        /* 圖片自訂面板 */
-        .upload-container {
-            background: #bbada0;
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 5px;
-            max-width: 360px;
-        }
-
-        .upload-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: #eee4da;
-            padding: 5px;
-            border-radius: 5px;
-            font-size: 11px;
-            color: #776e65;
-            font-weight: bold;
-        }
-
-        .upload-item input {
-            width: 70px;
-            font-size: 9px;
-            margin-top: 3px;
-        }
-
-        /* 分數面板 */
         .score-container {
             background: #bbada0;
             padding: 10px 25px;
-            font-size: 20px;
+            font-size: 22px;
             font-weight: bold;
             color: white;
             border-radius: 5px;
             margin-bottom: 15px;
         }
 
-        /* 4x4 遊戲棋盤 */
+        /* 背景圖片上傳控制區 */
+        .upload-panel {
+            background: #bbada0;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .upload-panel input {
+            margin-top: 5px;
+            font-size: 12px;
+        }
+
+        /* 4x4 遊戲大容器 */
         .game-container {
             position: relative;
             width: 340px;
@@ -73,7 +59,9 @@
             border-radius: 10px;
             padding: 10px;
             box-sizing: border-box;
-            touch-action: none; /* 防止手機滑動時網頁上下震動 */
+            touch-action: none; /* 防止手機上下捲動 */
+            background-size: cover;
+            background-position: center;
         }
 
         .grid-container {
@@ -85,12 +73,12 @@
             height: 100%;
         }
 
+        /* 半透明背景格，這樣能隱約透出你自訂的背景圖 */
         .grid-cell {
-            background: rgba(238, 228, 218, 0.35);
+            background: rgba(238, 228, 218, 0.4);
             border-radius: 5px;
         }
 
-        /* 數字/圖片方塊容器 */
         .tile-container {
             position: absolute;
             top: 10px;
@@ -100,6 +88,7 @@
             pointer-events: none;
         }
 
+        /* 數字方塊基本樣式 */
         .tile {
             position: absolute;
             width: 72px;
@@ -112,32 +101,30 @@
             justify-content: center;
             color: #776e65;
             background: #eee4da;
-            transition: transform 0.1s ease-in-out, top 0.1s ease-in-out, left 0.1s ease-in-out;
-            background-size: cover;
-            background-position: center;
+            transition: top 0.1s ease-in-out, left 0.1s ease-in-out;
             box-sizing: border-box;
         }
 
-        /* 各數字預設顏色 (若不換圖會套用此配色) */
-        .tile-2 { background: #eee4da; }
-        .tile-4 { background: #ede0c8; }
-        .tile-8 { background: #f2b179; color: #f9f6f2; }
-        .tile-16 { background: #f59563; color: #f9f6f2; }
-        .tile-32 { background: #f67c5f; color: #f9f6f2; }
-        .tile-64 { background: #f65e3b; color: #f9f6f2; }
-        .tile-128 { background: #edcf72; color: #f9f6f2; font-size: 24px; }
-        .tile-256 { background: #edcc61; color: #f9f6f2; font-size: 24px; }
-        .tile-512 { background: #edc850; color: #f9f6f2; font-size: 24px; }
-        .tile-1024 { background: #edc53f; color: #f9f6f2; font-size: 20px; }
-        .tile-2048 { background: #edc22e; color: #f9f6f2; font-size: 20px; }
-        .tile-4096 { background: #3c3a32; color: #f9f6f2; font-size: 20px; }
+        /* 各數字預設配色（微調半透明，讓整體視覺更好看） */
+        .tile-2 { background: rgba(238, 228, 218, 0.9); }
+        .tile-4 { background: rgba(237, 224, 200, 0.9); }
+        .tile-8 { background: rgba(242, 177, 121, 0.95); color: #f9f6f2; }
+        .tile-16 { background: rgba(245, 149, 99, 0.95); color: #f9f6f2; }
+        .tile-32 { background: rgba(246, 124, 95, 0.95); color: #f9f6f2; }
+        .tile-64 { background: rgba(246, 94, 59, 0.95); color: #f9f6f2; }
+        .tile-128 { background: rgba(237, 207, 114, 0.95); color: #f9f6f2; font-size: 24px; }
+        .tile-256 { background: rgba(237, 204, 97, 0.95); color: #f9f6f2; font-size: 24px; }
+        .tile-512 { background: rgba(237, 200, 80, 0.95); color: #f9f6f2; font-size: 24px; }
+        .tile-1024 { background: rgba(237, 197, 63, 0.95); color: #f9f6f2; font-size: 20px; }
+        .tile-2048 { background: rgba(237, 194, 46, 0.95); color: #f9f6f2; font-size: 20px; }
+        .tile-4096 { background: rgba(60, 58, 50, 0.95); color: #f9f6f2; font-size: 20px; }
 
-        /* 遮罩蓋板 (遊戲結束) */
+        /* 遊戲結束蓋板 */
         .game-message {
             display: none;
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(238, 228, 218, 0.73);
+            background: rgba(238, 228, 218, 0.8);
             flex-direction: column;
             align-items: center;
             justify-content: center;
@@ -146,7 +133,7 @@
         }
 
         .game-message p {
-            font-size: 40px;
+            font-size: 36px;
             font-weight: bold;
             color: #776e65;
             margin-bottom: 20px;
@@ -166,19 +153,18 @@
 </head>
 <body>
 
-    <h1>4096 經典滑塊</h1>
+    <h1>4096 經典益智</h1>
     
     <div class="score-container">SCORE: <span id="score">0</span></div>
 
-    <!-- 自訂圖片區 (挑選最主要的四個層級提供更換) -->
-    <div class="upload-container">
-        <div class="upload-item"><label>方塊 2 圖</label><input type="file" data-tile="2" accept="image/*"></div>
-        <div class="upload-item"><label>方塊 4 圖</label><input type="file" data-tile="4" accept="image/*"></div>
-        <div class="upload-item"><label>方塊 8 圖</label><input type="file" data-tile="8" accept="image/*"></div>
-        <div class="upload-item"><label>方塊 16 圖</label><input type="file" data-tile="16" accept="image/*"></div>
+    <!-- 自訂背景圖片區 -->
+    <div class="upload-panel">
+        <label for="bg-upload">🖼️ 更換遊戲大框框的背景圖片</label><br>
+        <input type="file" id="bg-upload" accept="image/*">
     </div>
 
-    <div class="game-container">
+    <!-- 遊戲主區塊 -->
+    <div class="game-container" id="game-container">
         <div class="grid-container">
             <!-- 4x4 背景網格 -->
             <div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>
@@ -187,10 +173,8 @@
             <div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>
         </div>
 
-        <!-- 實際移動的數字/圖片方塊 -->
         <div class="tile-container" id="tile-container"></div>
 
-        <!-- 結束或獲勝畫面 -->
         <div class="game-message" id="game-message">
             <p id="game-over-text">遊戲結束</p>
             <button class="retry-button" onclick="setupGame()">重新開始</button>
@@ -198,10 +182,12 @@
     </div>
 
     <script>
+        const gameContainer = document.getElementById('game-container');
         const tileContainer = document.getElementById('tile-container');
         const scoreDisplay = document.getElementById('score');
         const gameMessage = document.getElementById('game-message');
         const gameOverText = document.getElementById('game-over-text');
+        const bgUpload = document.getElementById('bg-upload');
 
         let board = Array(4).fill(null).map(() => Array(4).fill(0));
         let score = 0;
@@ -209,25 +195,19 @@
         const tileSize = 72;
         const gap = 10;
 
-        // 儲存用戶自訂圖片
-        let customTileImages = { 2: '', 4: '', 8: '', 16: '' };
-
-        // 監聽圖片上傳變更
-        document.querySelectorAll('.upload-item input').forEach(input => {
-            input.addEventListener('change', function(e) {
-                const num = this.dataset.tile;
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        customTileImages[num] = event.target.result;
-                        drawBoard(); // 立即重新渲染棋盤
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
+        // 監聽背景圖片上傳
+        bgUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    gameContainer.style.backgroundImage = `url('${event.target.result}')`;
+                };
+                reader.readAsDataURL(file);
+            }
         });
 
+        // 遊戲初始化
         function setupGame() {
             board = Array(4).fill(null).map(() => Array(4).fill(0));
             score = 0;
@@ -238,6 +218,7 @@
             drawBoard();
         }
 
+        // 隨機在空位產生 2 或 4
         function addRandomTile() {
             let emptyCells = [];
             for (let r = 0; r < size; r++) {
@@ -251,7 +232,7 @@
             }
         }
 
-        // 繪製棋盤與渲染圖片
+        // 畫出目前的數字方塊
         function drawBoard() {
             tileContainer.innerHTML = '';
             for (let r = 0; r < size; r++) {
@@ -260,26 +241,16 @@
                     if (value > 0) {
                         let tile = document.createElement('div');
                         tile.classList.add('tile', `tile-${value}`);
-                        
-                        // 計算正確的 CSS 絕對定位位置
                         tile.style.top = (r * (tileSize + gap)) + 'px';
                         tile.style.left = (c * (tileSize + gap)) + 'px';
-
-                        // 判斷是否套用自訂圖片，如果上傳了圖片就不顯示數字
-                        if (customTileImages[value]) {
-                            tile.style.backgroundImage = `url('${customTileImages[value]}')`;
-                            tile.style.color = 'transparent'; 
-                        } else {
-                            tile.textContent = value;
-                        }
-
+                        tile.textContent = value;
                         tileContainer.appendChild(tile);
                     }
                 }
             }
         }
 
-        // 核心移動邏輯
+        // 核心計算：滑動並合併一列
         function slide(row) {
             let arr = row.filter(val => val);
             for (let i = 0; i < arr.length - 1; i++) {
@@ -294,5 +265,27 @@
             return arr;
         }
 
+        // 處理四個方向的移動
         function move(direction) {
-            let moved = false;
+            let oldBoard = JSON.stringify(board);
+
+            if (direction === 'left') {
+                for (let r = 0; r < size; r++) board[r] = slide(board[r]);
+            } else if (direction === 'right') {
+                for (let r = 0; r < size; r++) {
+                    board[r].reverse();
+                    board[r] = slide(board[r]);
+                    board[r].reverse();
+                }
+            } else if (direction === 'up') {
+                for (let c = 0; c < size; c++) {
+                    let row = [board[0][c], board[1][c], board[2][c], board[3][c]];
+                    row = slide(row);
+                    for (let r = 0; r < size; r++) board[r][c] = row[r];
+                }
+            } else if (direction === 'down') {
+                for (let c = 0; c < size; c++) {
+                    let row = [board[0][c], board[1][c], board[2][c], board[3][c]].reverse();
+                    row = slide(row);
+                    row.reverse();
+
