@@ -195,6 +195,10 @@
         const tileSize = 72;
         const gap = 10;
 
+        // 手機觸控座標紀錄
+        let touchStartX = 0;
+        let touchStartY = 0;
+
         // 監聽背景圖片上傳
         bgUpload.addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -206,17 +210,6 @@
                 reader.readAsDataURL(file);
             }
         });
-
-        // 遊戲初始化
-        function setupGame() {
-            board = Array(4).fill(null).map(() => Array(4).fill(0));
-            score = 0;
-            scoreDisplay.textContent = score;
-            gameMessage.style.display = 'none';
-            addRandomTile();
-            addRandomTile();
-            drawBoard();
-        }
 
         // 隨機在空位產生 2 或 4
         function addRandomTile() {
@@ -250,9 +243,9 @@
             }
         }
 
-        // 核心計算：滑動並合併一列
+        // 核心滑動與合併邏輯 (一維陣列處理)
         function slide(row) {
-            let arr = row.filter(val => val);
+            let arr = row.filter(val => val !== 0); // 去除空位
             for (let i = 0; i < arr.length - 1; i++) {
                 if (arr[i] === arr[i + 1]) {
                     arr[i] *= 2;
@@ -260,32 +253,43 @@
                     arr[i + 1] = 0;
                 }
             }
-            arr = arr.filter(val => val);
-            while (arr.length < size) arr.push(0);
+            arr = arr.filter(val => val !== 0);
+            while (arr.length < size) {
+                arr.push(0); // 補齊空位
+            }
             return arr;
         }
 
-        // 處理四個方向的移動
+        // 移動控制主函數
         function move(direction) {
+            let moved = false;
             let oldBoard = JSON.stringify(board);
 
-            if (direction === 'left') {
-                for (let r = 0; r < size; r++) board[r] = slide(board[r]);
-            } else if (direction === 'right') {
+            if (direction === 'LEFT') {
                 for (let r = 0; r < size; r++) {
-                    board[r].reverse();
                     board[r] = slide(board[r]);
-                    board[r].reverse();
                 }
-            } else if (direction === 'up') {
+            } else if (direction === 'RIGHT') {
+                for (let r = 0; r < size; r++) {
+                    board[r] = slide(board[r].reverse()).reverse();
+                }
+            } else if (direction === 'UP') {
                 for (let c = 0; c < size; c++) {
                     let row = [board[0][c], board[1][c], board[2][c], board[3][c]];
                     row = slide(row);
                     for (let r = 0; r < size; r++) board[r][c] = row[r];
                 }
-            } else if (direction === 'down') {
+            } else if (direction === 'DOWN') {
                 for (let c = 0; c < size; c++) {
-                    let row = [board[0][c], board[1][c], board[2][c], board[3][c]].reverse();
-                    row = slide(row);
-                    row.reverse();
+                    let row = [board[0][c], board[1][c], board[2][c], board[3][c]];
+                    row = slide(row.reverse()).reverse();
+                    for (let r = 0; r < size; r++) board[r][c] = row[r];
+                }
+            }
 
+            if (oldBoard !== JSON.stringify(board)) {
+                moved = true;
+            }
+
+            if (moved) {
+                addRandomTile();
