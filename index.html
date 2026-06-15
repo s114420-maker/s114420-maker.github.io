@@ -3,76 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>撲克牌記憶配對遊戲 ｜ 腦力大考驗</title>
-
-    <!-- 社群分享優化 (Open Graph tags) -->
-    <meta property="og:title" content="撲克牌記憶配對遊戲 ｜ 腦力大考驗" />
-    <meta property="og:description" content="好玩的經典翻牌記憶遊戲！自動洗牌、計時與步數統計，快來挑戰你的大腦記憶極限！" />
-    <meta property="og:type" content="website" />
-    <!-- 以下圖片網址可自由替換成你想顯示的封面圖 -->
-    <meta property="og:image" content="https://unsplash.com" />
+    <title>向日葵日常 ｜ 盲盒隨機翻牌配對遊戲</title>
 
     <style>
         :root {
-            --bg-color: #2c3e50;
-            --card-back: #e74c3c;
-            --card-front: #ffffff;
+            /* 配合 817 派對與溫馨插畫調整的繽紛文青配色 */
+            --bg-color: #1a2536;
+            --panel-bg: rgba(255, 255, 255, 0.08);
+            --accent-color: #ffd166;
+            --card-front-bg: #ffffff;
+            --border-normal: #f4a261;
+            --border-matched: #06d6a0;
         }
 
         body {
             margin: 0;
             padding: 20px;
             background-color: var(--bg-color);
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-image: radial-gradient(rgba(255, 209, 102, 0.06) 15%, transparent 16%);
+            background-size: 30px 30px;
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
             color: white;
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
 
         h1 {
-            margin-bottom: 10px;
+            margin-bottom: 5px;
+            font-size: 2.2rem;
+            color: var(--accent-color);
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            letter-spacing: 1px;
         }
 
-        /* 儀表板資訊 */
+        /* 數據看板 */
         .info-panel {
             display: flex;
-            gap: 20px;
+            gap: 40px;
             font-size: 1.2rem;
-            margin-bottom: 20px;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 10px 20px;
-            border-radius: 8px;
+            margin-bottom: 25px;
+            background: var(--panel-bg);
+            padding: 10px 30px;
+            border-radius: 50px;
+            border: 2px solid var(--accent-color);
+            backdrop-filter: blur(4px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        /* 遊戲主舞台 */
+        .info-panel span {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        /* 4x4 遊戲網格 */
         .game-board {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            max-width: 600px;
+            gap: 12px;
+            max-width: 520px;
             width: 100%;
         }
 
-        /* 卡牌基礎樣式 */
+        /* 卡牌基礎與立體翻轉 */
         .card {
-            aspect-ratio: 2 / 3;
+            aspect-ratio: 1 / 1;
             position: relative;
             transform-style: preserve-3d;
-            transition: transform 0.6s;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
         }
 
-        /* 翻牌動態效能 */
-        .card.flipped {
+        .card.flipped, .card.matched {
             transform: rotateY(180deg);
-        }
-
-        .card.matched {
-            transform: rotateY(180deg);
-            opacity: 0.6;
-            cursor: default;
-            pointer-events: none;
         }
 
         .card-face {
@@ -80,47 +85,53 @@
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
-            border-radius: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2rem;
-            font-weight: bold;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            border-radius: 14px;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.4);
+            box-sizing: border-box;
         }
 
         /* 卡背 */
         .card-back {
-            background-color: var(--card-back);
-            border: 5px solid white;
-            box-sizing: border-box;
-            background-image: radial-gradient(rgba(255,255,255,0.3) 15%, transparent 16%),
-                              radial-gradient(rgba(255,255,255,0.3) 15%, transparent 16%);
-            background-size: 16px 16px;
-            background-position: 0 0, 8px 8px;
+            border: 3.5px solid #ffffff;
+            transition: all 0.3s ease;
+            background-color: #2b3a4a;
+        }
+        .card:hover .card-back {
+            border-color: var(--accent-color);
+            transform: scale(1.03);
         }
 
-        /* 卡面 */
+        /* 卡面：撲克牌花色樣式 */
         .card-front {
-            background-color: var(--card-front);
+            background-color: var(--card-front-bg);
             transform: rotateY(180deg);
+            display: flex;
             flex-direction: column;
             justify-content: space-between;
             padding: 10px;
-            box-sizing: border-box;
+            border: 3.5px solid var(--border-normal);
+        }
+
+        /* 配對成功鎖定特效 */
+        .card.matched .card-front {
+            border-color: var(--border-matched);
+            box-shadow: 0 0 18px rgba(6, 214, 160, 0.7);
+            animation: matchPulse 1.5s infinite alternate;
         }
 
         /* 花色顏色調整 */
-        .card-front.red { color: #e74c3c; }
-        .card-front.black { color: #2c3e50; }
+        .card-front.red { color: #ef476f; }
+        .card-front.black { color: #118ab2; }
 
         .card-corner {
             align-self: flex-start;
             font-size: 1.2rem;
+            font-weight: 900;
             line-height: 1;
         }
         .card-center {
-            font-size: 3rem;
+            font-size: 2.8rem;
+            align-self: center;
             line-height: 1;
         }
         .card-corner.bottom {
@@ -130,22 +141,32 @@
 
         /* 按鈕樣式 */
         .btn {
-            margin-top: 20px;
-            padding: 10px 25px;
+            margin-top: 30px;
+            padding: 12px 40px;
             font-size: 1.1rem;
-            background-color: #2ecc71;
-            color: white;
+            font-weight: bold;
+            background: linear-gradient(45deg, #f4a261, var(--accent-color));
+            color: #1a2536;
             border: none;
-            border-radius: 5px;
+            border-radius: 30px;
             cursor: pointer;
-            transition: background 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
         }
-        .btn:hover { background-color: #27ae60; }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 209, 102, 0.4);
+        }
 
-        /* RWD 調整 */
+        @keyframes matchPulse {
+            0% { box-shadow: 0 0 8px rgba(6, 214, 160, 0.4); }
+            100% { box-shadow: 0 0 22px rgba(6, 214, 160, 0.8); }
+        }
+
         @media (max-width: 480px) {
+            h1 { font-size: 1.6rem; }
+            .info-panel { gap: 20px; font-size: 1rem; padding: 8px 20px; }
             .game-board { gap: 8px; }
-            .card-face { font-size: 1.5rem; }
             .card-center { font-size: 2rem; }
             .card-corner { font-size: 0.9rem; }
         }
@@ -153,7 +174,7 @@
 </head>
 <body>
 
-    <h1>撲克牌記憶配對</h1>
+    <h1>向日葵特輯 ﹒ 隨機盲盒配對</h1>
     
     <div class="info-panel">
         <div>時間: <span id="timer">0</span> 秒</div>
@@ -162,11 +183,11 @@
 
     <div class="game-board" id="board"></div>
 
-    <button class="btn" onclick="resetGame()">重新開始</button>
+    <button class="btn" onclick="resetGame()">重新隨機洗牌</button>
 
     <script>
-        // 定義遊戲所需的 8 對撲克牌（共 16 張）
-        const cardData = [
+        // 定義 8 組正面花色
+        const baseCards = [
             { suit: '♠', value: 'A', color: 'black' },
             { suit: '♥', value: 'K', color: 'red' },
             { suit: '♦', value: 'Q', color: 'red' },
@@ -177,9 +198,26 @@
             { suit: '♣', value: '7', color: 'black' }
         ];
 
-        // 複製成雙份
-        let cards = [...cardData, ...cardData];
-        
+        // 16 種精緻的卡背樣式組合
+        const cardBackPool = [
+            { img: 'image1.jpg', size: 'cover', pos: 'center' },
+            { img: 'image1.jpg', size: '180%', pos: '48% 85%' },
+            { img: 'image2.jpg', size: 'cover', pos: 'center' },
+            { img: 'image2.jpg', size: '180%', pos: '80% 68%' },
+            { img: 'image3.jpg', size: 'cover', pos: 'center' },
+            { img: 'image3.jpg', size: '180%', pos: '50% 80%' },
+            { img: 'image4.jpg', size: 'cover', pos: 'center' },
+            { img: 'image4.jpg', size: '180%', pos: '85% 42%' },
+            { img: 'image5.jpg', size: 'cover', pos: 'center' },
+            { img: 'image5.jpg', size: '170%', pos: '80% 25%' },
+            { img: 'image5.jpg', size: '170%', pos: '48% 68%' },
+            { img: 'image6.jpg', size: 'cover', pos: 'center' },
+            { img: 'image6.jpg', size: '160%', pos: '50% 10%' },
+            { img: 'image6.jpg', size: '170%', pos: '78% 62%' },
+            { img: 'image6.jpg', size: '170%', pos: '48% 62%' }
+        ];
+
+        let cards = [];
         let flippedCards = [];
         let matchedCount = 0;
         let moves = 0;
@@ -200,7 +238,27 @@
             return array;
         }
 
-        // 初始化遊戲板
+        function generateDeck() {
+            let deck = [];
+            // 複製出 16 張正面花色的牌組
+            const tempFronts = [...baseCards, ...baseCards];
+            
+            // 【核心修改】：每次洗牌時，也將卡背池隨機打亂！
+            const shuffledBacks = shuffle([...cardBackPool]);
+
+            tempFronts.forEach((front, index) => {
+                // 如果卡背池數量少於 16，則安全取餘數（此處卡背池有 15 種，會有一種被複用，完美運作）
+                const backConfig = shuffledBacks[index % shuffledBacks.length];
+                deck.push({
+                    ...front,
+                    bgImage: backConfig.img,
+                    bgSize: backConfig.size,
+                    bgPos: backConfig.pos
+                });
+            });
+            return deck;
+        }
+
         function initGame() {
             board.innerHTML = '';
             flippedCards = [];
@@ -212,17 +270,18 @@
             timerEl.textContent = seconds;
             movesEl.textContent = moves;
 
-            const shuffledCards = shuffle([...cards]);
+            // 1. 生成卡背與正面花色隨機配對的牌組
+            // 2. 再將整組牌全面大洗牌，決定畫面的排列順序
+            cards = shuffle(generateDeck());
 
-            shuffledCards.forEach((card, index) => {
+            cards.forEach((card) => {
                 const cardEl = document.createElement('div');
                 cardEl.classList.add('card');
-                cardEl.dataset.index = index;
                 cardEl.dataset.suit = card.suit;
                 cardEl.dataset.value = card.value;
 
                 cardEl.innerHTML = `
-                    <div class="card-face card-back"></div>
+                    <div class="card-face card-back" style="background-image: url('${card.bgImage}'); background-size: ${card.bgSize}; background-position: ${card.bgPos};"></div>
                     <div class="card-face card-front ${card.color}">
                         <div class="card-corner">${card.value}<br>${card.suit}</div>
                         <div class="card-center">${card.suit}</div>
@@ -235,7 +294,6 @@
             });
         }
 
-        // 計時器功能
         function startTimer() {
             gameStarted = true;
             timer = setInterval(() => {
@@ -244,59 +302,5 @@
             }, 1000);
         }
 
-        // 翻牌邏輯
         function flipCard() {
             if (!gameStarted) startTimer();
-            
-            // 防止重複點擊已翻開、已配對的牌，或同時點擊超過兩張牌
-            if (this.classList.contains('flipped') || this.classList.contains('matched') || flippedCards.length >= 2) {
-                return;
-            }
-
-            this.classList.add('flipped');
-            flippedCards.push(this);
-
-            if (flippedCards.length === 2) {
-                moves++;
-                movesEl.textContent = moves;
-                checkMatch();
-            }
-        }
-
-        // 檢查是否配對成功
-        function checkMatch() {
-            const [card1, card2] = flippedCards;
-            const isMatch = card1.dataset.suit === card2.dataset.suit && card1.dataset.value === card2.dataset.value;
-
-            if (isMatch) {
-                card1.classList.add('matched');
-                card2.classList.add('matched');
-                matchedCount += 2;
-                flippedCards = [];
-
-                // 檢查是否全破
-                if (matchedCount === cards.length) {
-                    clearInterval(timer);
-                    setTimeout(() => {
-                        alert(`恭喜通關！🎉\n總共花費了 ${seconds} 秒，翻牌次數：${moves} 次！`);
-                    }, 500);
-                }
-            } else {
-                // 配對失敗，0.8秒後翻回去
-                setTimeout(() => {
-                    card1.classList.remove('flipped');
-                    card2.classList.remove('flipped');
-                    flippedCards = [];
-                }, 800);
-            }
-        }
-
-        function resetGame() {
-            initGame();
-        }
-
-        // 網頁載入時啟動
-        initGame();
-    </script>
-</body>
-</html>
