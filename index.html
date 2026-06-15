@@ -3,27 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>向日葵日常 ｜ 盲盒隨機翻牌配對遊戲</title>
+    <title>向日葵小花園 ｜ 盲盒隨機記憶對決</title>
 
     <style>
         :root {
-            /* 配合 817 派對與溫馨插畫調整的繽紛文青配色 */
-            --bg-color: #1a2536;
-            --panel-bg: rgba(255, 255, 255, 0.08);
-            --accent-color: #ffd166;
-            --card-front-bg: #ffffff;
-            --border-normal: #f4a261;
-            --border-matched: #06d6a0;
+            /* 專屬溫馨淡黃色繪本風格 */
+            --bg-color: #fcf8ee;       /* 溫暖淡黃色背景 */
+            --panel-bg: #ffffff;       /* 白色純淨看板 */
+            --accent-color: #e2a04e;    /* 向日葵深黃 */
+            --card-front-bg: #ffffff;  /* 卡片正面白色 */
+            --border-normal: #f0cb85;  /* 卡片未配對時的淡黃邊框 */
+            --border-matched: #52b788; /* 配對成功時的草綠色邊框 */
+            --text-dark: #4a3e3d;      /* 繪本風深色文字 */
         }
 
         body {
             margin: 0;
             padding: 20px;
             background-color: var(--bg-color);
-            background-image: radial-gradient(rgba(255, 209, 102, 0.06) 15%, transparent 16%);
-            background-size: 30px 30px;
+            background-image: radial-gradient(rgba(226, 160, 78, 0.12) 15%, transparent 16%);
+            background-size: 24px 24px;
             font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
-            color: white;
+            color: var(--text-dark);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -35,7 +36,7 @@
             margin-bottom: 5px;
             font-size: 2.2rem;
             color: var(--accent-color);
-            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
             letter-spacing: 1px;
         }
 
@@ -48,9 +49,13 @@
             background: var(--panel-bg);
             padding: 10px 30px;
             border-radius: 50px;
-            border: 2px solid var(--accent-color);
-            backdrop-filter: blur(4px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border: 2px solid var(--border-normal);
+            box-shadow: 0 4px 12px rgba(226, 160, 78, 0.1);
+        }
+
+        .info-panel div {
+            color: var(--text-dark);
+            font-weight: 500;
         }
 
         .info-panel span {
@@ -67,7 +72,7 @@
             width: 100%;
         }
 
-        /* 卡牌基礎與立體翻轉 */
+        /* 卡牌立體翻轉 */
         .card {
             aspect-ratio: 1 / 1;
             position: relative;
@@ -86,15 +91,18 @@
             height: 100%;
             backface-visibility: hidden;
             border-radius: 14px;
-            box-shadow: 0 5px 12px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 10px rgba(74, 62, 61, 0.12);
             box-sizing: border-box;
         }
 
-        /* 卡背 */
+        /* 卡背：固定完整縮放呈現整張插畫 */
         .card-back {
             border: 3.5px solid #ffffff;
             transition: all 0.3s ease;
-            background-color: #2b3a4a;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #fff2da;
         }
         .card:hover .card-back {
             border-color: var(--accent-color);
@@ -112,16 +120,16 @@
             border: 3.5px solid var(--border-normal);
         }
 
-        /* 配對成功鎖定特效 */
+        /* 配對成功鎖定特效：溫和的草綠色光暈 */
         .card.matched .card-front {
             border-color: var(--border-matched);
-            box-shadow: 0 0 18px rgba(6, 214, 160, 0.7);
+            box-shadow: 0 0 15px rgba(82, 183, 136, 0.5);
             animation: matchPulse 1.5s infinite alternate;
         }
 
         /* 花色顏色調整 */
-        .card-front.red { color: #ef476f; }
-        .card-front.black { color: #118ab2; }
+        .card-front.red { color: #de5d68; }
+        .card-front.black { color: #3d5a80; }
 
         .card-corner {
             align-self: flex-start;
@@ -145,22 +153,23 @@
             padding: 12px 40px;
             font-size: 1.1rem;
             font-weight: bold;
-            background: linear-gradient(45deg, #f4a261, var(--accent-color));
-            color: #1a2536;
+            background: linear-gradient(45deg, #f7d08a, var(--accent-color));
+            color: #ffffff;
             border: none;
             border-radius: 30px;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 12px rgba(226, 160, 78, 0.2);
             transition: all 0.3s ease;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 209, 102, 0.4);
+            box-shadow: 0 6px 15px rgba(226, 160, 78, 0.3);
         }
 
         @keyframes matchPulse {
-            0% { box-shadow: 0 0 8px rgba(6, 214, 160, 0.4); }
-            100% { box-shadow: 0 0 22px rgba(6, 214, 160, 0.8); }
+            0% { box-shadow: 0 0 5px rgba(82, 183, 136, 0.3); }
+            100% { box-shadow: 0 0 15px rgba(82, 183, 136, 0.6); }
         }
 
         @media (max-width: 480px) {
@@ -174,7 +183,7 @@
 </head>
 <body>
 
-    <h1>向日葵特輯 ﹒ 隨機盲盒配對</h1>
+    <h1>🌻 向日葵日常 ﹒ 隨機盲盒配對</h1>
     
     <div class="info-panel">
         <div>時間: <span id="timer">0</span> 秒</div>
@@ -198,23 +207,14 @@
             { suit: '♣', value: '7', color: 'black' }
         ];
 
-        // 16 種精緻的卡背樣式組合
-        const cardBackPool = [
-            { img: 'image1.jpg', size: 'cover', pos: 'center' },
-            { img: 'image1.jpg', size: '180%', pos: '48% 85%' },
-            { img: 'image2.jpg', size: 'cover', pos: 'center' },
-            { img: 'image2.jpg', size: '180%', pos: '80% 68%' },
-            { img: 'image3.jpg', size: 'cover', pos: 'center' },
-            { img: 'image3.jpg', size: '180%', pos: '50% 80%' },
-            { img: 'image4.jpg', size: 'cover', pos: 'center' },
-            { img: 'image4.jpg', size: '180%', pos: '85% 42%' },
-            { img: 'image5.jpg', size: 'cover', pos: 'center' },
-            { img: 'image5.jpg', size: '170%', pos: '80% 25%' },
-            { img: 'image5.jpg', size: '170%', pos: '48% 68%' },
-            { img: 'image6.jpg', size: 'cover', pos: 'center' },
-            { img: 'image6.jpg', size: '160%', pos: '50% 10%' },
-            { img: 'image6.jpg', size: '170%', pos: '78% 62%' },
-            { img: 'image6.jpg', size: '170%', pos: '48% 62%' }
+        // 依然使用剛才的 6 張插畫檔名作為卡背來源
+        const backImages = [
+            'image1.jpg',
+            'image2.jpg',
+            'image3.jpg',
+            'image4.jpg',
+            'image5.jpg',
+            'image6.jpg'
         ];
 
         let cards = [];
@@ -238,22 +238,23 @@
             return array;
         }
 
+        // 核心機制：動態生成 16 張卡，並從 6 張圖中隨機抽樣指派給卡背，永不報錯
         function generateDeck() {
             let deck = [];
-            // 複製出 16 張正面花色的牌組
             const tempFronts = [...baseCards, ...baseCards];
             
-            // 【核心修改】：每次洗牌時，也將卡背池隨機打亂！
-            const shuffledBacks = shuffle([...cardBackPool]);
+            // 建立一個 16 個位置的隨機卡背陣列
+            let assignedBacks = [];
+            for (let i = 0; i < 16; i++) {
+                // 每次循環都從 6 張原圖中，隨機抽出一張
+                const randomImg = backImages[Math.floor(Math.random() * backImages.length)];
+                assignedBacks.push(randomImg);
+            }
 
             tempFronts.forEach((front, index) => {
-                // 如果卡背池數量少於 16，則安全取餘數（此處卡背池有 15 種，會有一種被複用，完美運作）
-                const backConfig = shuffledBacks[index % shuffledBacks.length];
                 deck.push({
                     ...front,
-                    bgImage: backConfig.img,
-                    bgSize: backConfig.size,
-                    bgPos: backConfig.pos
+                    bgImage: assignedBacks[index]
                 });
             });
             return deck;
@@ -270,8 +271,7 @@
             timerEl.textContent = seconds;
             movesEl.textContent = moves;
 
-            // 1. 生成卡背與正面花色隨機配對的牌組
-            // 2. 再將整組牌全面大洗牌，決定畫面的排列順序
+            // 雙重大洗牌：先隨機抽取配對卡背，再大洗牌打亂網格順序
             cards = shuffle(generateDeck());
 
             cards.forEach((card) => {
@@ -281,7 +281,7 @@
                 cardEl.dataset.value = card.value;
 
                 cardEl.innerHTML = `
-                    <div class="card-face card-back" style="background-image: url('${card.bgImage}'); background-size: ${card.bgSize}; background-position: ${card.bgPos};"></div>
+                    <div class="card-face card-back" style="background-image: url('${card.bgImage}');"></div>
                     <div class="card-face card-front ${card.color}">
                         <div class="card-corner">${card.value}<br>${card.suit}</div>
                         <div class="card-center">${card.suit}</div>
@@ -304,3 +304,19 @@
 
         function flipCard() {
             if (!gameStarted) startTimer();
+            if (this.classList.contains('flipped') || this.classList.contains('matched') || flippedCards.length >= 2) {
+                return;
+            }
+
+            this.classList.add('flipped');
+            flippedCards.push(this);
+
+            if (flippedCards.length === 2) {
+                moves++;
+                movesEl.textContent = moves;
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
