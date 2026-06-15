@@ -63,7 +63,7 @@
 
         /* 卡牌基礎樣式 */
         .card {
-            aspect-ratio: 2 / 3; /* 經典長方形撲克牌完美比例 */
+            aspect-ratio: 2 / 3;
             position: relative;
             transform-style: preserve-3d;
             transition: transform 0.6s;
@@ -75,7 +75,7 @@
             transform: rotateY(180deg);
         }
 
-        /* 成功時：保持正面花色朝上，不變淡，鎖定點擊 */
+        /* 配對成功後：保持正面花色朝上，維持原本清晰度，並鎖定點擊 */
         .card.matched {
             cursor: default;
             pointer-events: none;
@@ -95,7 +95,7 @@
             box-shadow: 0 4px 8px rgba(74, 62, 61, 0.15);
         }
 
-        /* 卡背：使用你上傳的 6 張插畫圖片 */
+        /* 卡背：換成你上傳的 6 張插畫圖片 */
         .card-back {
             border: 4px solid white;
             box-sizing: border-box;
@@ -103,7 +103,6 @@
             background-position: center;
             background-repeat: no-repeat;
             background-color: #fff2da;
-            transition: border-color 0.2s;
         }
         .card:hover .card-back {
             border-color: var(--accent-color);
@@ -121,8 +120,8 @@
         }
 
         /* 花色顏色調整 */
-        .card-front.red { color: #de5d68; }
-        .card-front.black { color: #3d5a80; }
+        .card-front.red { color: #e74c3c; }
+        .card-front.black { color: #2c3e50; }
 
         .card-corner {
             align-self: flex-start;
@@ -181,7 +180,7 @@
     <button class="btn" onclick="resetGame()">重新開始</button>
 
     <script>
-        // 第一版固定的 8 組正面撲克牌型
+        // 定義遊戲所需的 8 對撲克牌（共 16 張）
         const cardData = [
             { suit: '♠', value: 'A', color: 'black' },
             { suit: '♥', value: 'K', color: 'red' },
@@ -210,7 +209,7 @@
         const timerEl = document.getElementById('timer');
         const movesEl = document.getElementById('moves');
 
-        // 第一版洗牌演算法 (Fisher-Yates)
+        // 洗牌演算法 (Fisher-Yates)
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -219,11 +218,12 @@
             return array;
         }
 
-        // 動態配給 16 張卡片的卡背（從 6 張圖庫裡隨機抽樣，絕不報錯）
+        // 為 16 張牌自動隨機指派 6 張圖片作為卡背
         function generateDeck() {
             let deck = [];
             const tempFronts = [...cardData, ...cardData];
             
+            // 隨機抽選 16 個卡背
             let assignedBacks = [];
             for (let i = 0; i < 16; i++) {
                 const randomImg = backImages[Math.floor(Math.random() * backImages.length)];
@@ -251,7 +251,7 @@
             timerEl.textContent = seconds;
             movesEl.textContent = moves;
 
-            // 生成隨機卡背，並打亂卡牌在畫面上的排列位置
+            // 打亂所有卡片位置
             cards = shuffle(generateDeck());
 
             cards.forEach((card) => {
@@ -307,7 +307,7 @@
             const isMatch = card1.dataset.suit === card2.dataset.suit && card1.dataset.value === card2.dataset.value;
 
             if (isMatch) {
-                // 成功時直接移除 flipped 並加上 matched，保持正面花色完全不變淡
+                // 成功時：移除 flipped 並加上 matched，保持正面花色朝上，且不變淡
                 card1.classList.remove('flipped');
                 card2.classList.remove('flipped');
                 card1.classList.add('matched');
