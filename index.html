@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>向日葵日常 ｜ 隨機盲盒記憶配對</title>
+    <title>向日葵花園 ｜ 撲克牌記憶配對遊戲</title>
 
     <style>
         :root {
@@ -72,12 +72,12 @@
             width: 100%;
         }
 
-        /* 卡牌立體翻轉 */
+        /* 卡牌立體翻轉（繼承第一版的流暢動畫） */
         .card {
-            aspect-ratio: 1 / 1;
+            aspect-ratio: 2 / 3; /* 回歸第一版經典撲克牌完美比例 */
             position: relative;
             transform-style: preserve-3d;
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.6s;
             cursor: pointer;
         }
 
@@ -85,17 +85,23 @@
             transform: rotateY(180deg);
         }
 
+        /* 第一版配對成功邏輯：鎖定正面朝上，不變透明 */
+        .card.matched {
+            cursor: default;
+            pointer-events: none;
+        }
+
         .card-face {
             position: absolute;
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
-            border-radius: 14px;
+            border-radius: 12px;
             box-shadow: 0 4px 10px rgba(74, 62, 61, 0.12);
             box-sizing: border-box;
         }
 
-        /* 卡背：固定完整縮放呈現整張插畫 */
+        /* 卡背：完整縮放呈現整張插畫 */
         .card-back {
             border: 3.5px solid #ffffff;
             transition: all 0.3s ease;
@@ -106,10 +112,9 @@
         }
         .card:hover .card-back {
             border-color: var(--accent-color);
-            transform: scale(1.03);
         }
 
-        /* 卡面：撲克牌花色樣式 */
+        /* 卡面：第一版經典撲克牌樣式 */
         .card-front {
             background-color: var(--card-front-bg);
             transform: rotateY(180deg);
@@ -124,7 +129,6 @@
         .card.matched .card-front {
             border-color: var(--border-matched);
             box-shadow: 0 0 15px rgba(82, 183, 136, 0.5);
-            animation: matchPulse 1.5s infinite alternate;
         }
 
         /* 花色顏色調整 */
@@ -133,7 +137,7 @@
 
         .card-corner {
             align-self: flex-start;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 900;
             line-height: 1;
         }
@@ -167,11 +171,6 @@
             box-shadow: 0 6px 15px rgba(226, 160, 78, 0.3);
         }
 
-        @keyframes matchPulse {
-            0% { box-shadow: 0 0 5px rgba(82, 183, 136, 0.3); }
-            100% { box-shadow: 0 0 15px rgba(82, 183, 136, 0.6); }
-        }
-
         @media (max-width: 480px) {
             h1 { font-size: 1.6rem; }
             .info-panel { gap: 20px; font-size: 1rem; padding: 8px 20px; }
@@ -183,7 +182,7 @@
 </head>
 <body>
 
-    <h1>🌻 向日葵日常 ﹒ 隨機盲盒配對</h1>
+    <h1>🌻 向日葵日常 ﹒ 記憶配對</h1>
     
     <div class="info-panel">
         <div>時間: <span id="timer">0</span> 秒</div>
@@ -192,29 +191,24 @@
 
     <div class="game-board" id="board"></div>
 
-    <button class="btn" onclick="resetGame()">重新隨機洗牌</button>
+    <button class="btn" onclick="resetGame()">重新開始</button>
 
     <script>
-        // 52張牌的完整花色與點數庫（用於支援完全隨機的題目）
-        const suits = [
-            { symbol: '♠', color: 'black' },
-            { symbol: '♥', color: 'red' },
-            { symbol: '♦', color: 'red' },
-            { symbol: '♣', color: 'black' }
+        // 第一版固定的 8 組正面撲克牌型
+        const baseCards = [
+            { suit: '♠', value: 'A', color: 'black' },
+            { suit: '♥', value: 'K', color: 'red' },
+            { suit: '♦', value: 'Q', color: 'red' },
+            { suit: '♣', value: 'J', color: 'black' },
+            { suit: '♠', value: '10', color: 'black' },
+            { suit: '♥', value: '9', color: 'red' },
+            { suit: '♦', value: '8', color: 'red' },
+            { suit: '♣', value: '7', color: 'black' }
         ];
-        const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
-        // 你的 6 張主要向日葵插畫卡背檔名
-        const localImages = [
+        // 你的 6 張主要插畫卡背檔名
+        const backImages = [
             'image1.jpg', 'image2.jpg', 'image3.jpg', 'image4.jpg', 'image5.jpg', 'image6.jpg'
-        ];
-
-        // 免費備用雲端圖庫庫（萬一本地圖載入失敗，會由這幾張溫馨和風插畫補上，網頁絕對不卡死）
-        const fallbackImages = [
-            'https://unsplash.com',
-            'https://unsplash.com',
-            'https://unsplash.com',
-            'https://unsplash.com'
         ];
 
         let cards = [];
@@ -229,7 +223,7 @@
         const timerEl = document.getElementById('timer');
         const movesEl = document.getElementById('moves');
 
-        // 洗牌演算法 (Fisher-Yates)
+        // 第一版經典洗牌演算法 (Fisher-Yates)
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -238,33 +232,16 @@
             return array;
         }
 
-        // 核心邏輯：隨機選取 8 組不重複的撲克牌題目
-        function getRandomPokerPairs() {
-            let allCombinations = [];
-            suits.forEach(s => {
-                values.forEach(v => {
-                    allCombinations.push({ suit: s.symbol, value: v, color: s.color });
-                });
-            });
-            
-            // 打亂所有52張牌的可能組合，挑出前 8 個
-            shuffle(allCombinations);
-            return allCombinations.slice(0, 8);
-        }
-
-        // 核心邏輯：動態生成 16 張卡，並將卡背隨機打亂
+        // 核心邏輯：複製正面花色，並隨機分派 6 張卡背圖，永不報錯
         function generateDeck() {
             let deck = [];
-            // 隨機獲得 8 組花色，複製兩份變成 16 張牌
-            const randomBaseCards = getRandomPokerPairs();
-            const tempFronts = [...randomBaseCards, ...randomBaseCards];
+            const tempFronts = [...baseCards, ...baseCards];
             
-            // 隨機生成 16 個獨立的卡背圖片連結
+            // 建立 16 個位置的隨機卡背圖片
             let assignedBacks = [];
             for (let i = 0; i < 16; i++) {
-                // 從 6 張本地圖隨機挑一張
-                const randomLocalImg = localImages[Math.floor(Math.random() * localImages.length)];
-                assignedBacks.push(randomLocalImg);
+                const randomImg = backImages[Math.floor(Math.random() * backImages.length)];
+                assignedBacks.push(randomImg);
             }
 
             tempFronts.forEach((front, index) => {
@@ -287,7 +264,7 @@
             timerEl.textContent = seconds;
             movesEl.textContent = moves;
 
-            // 隨機抽取題目與卡背，再大洗牌決定排列位置
+            // 使用第一版遊戲方式：洗牌打亂所有卡片位置
             cards = shuffle(generateDeck());
 
             cards.forEach((card) => {
@@ -296,7 +273,6 @@
                 cardEl.dataset.suit = card.suit;
                 cardEl.dataset.value = card.value;
 
-                // 建立卡片內層，並嵌入 onerror 防崩潰機制
                 cardEl.innerHTML = `
                     <div class="card-face card-back" style="background-image: url('${card.bgImage}');"></div>
                     <div class="card-face card-front ${card.color}">
@@ -306,5 +282,40 @@
                     </div>
                 `;
 
-                // 核心防白邊崩潰設定：萬一本地圖片讀取有問題，自動更換成雲端穩定插畫背景
-                const cardBackEl = cardEl.querySelector('.card-back');
+                cardEl.addEventListener('click', flipCard);
+                board.appendChild(cardEl);
+            });
+        }
+
+        function startTimer() {
+            gameStarted = true;
+            timer = setInterval(() => {
+                seconds++;
+                timerEl.textContent = seconds;
+            }, 1000);
+        }
+
+        function flipCard() {
+            if (!gameStarted) startTimer();
+            if (this.classList.contains('flipped') || this.classList.contains('matched') || flippedCards.length >= 2) {
+                return;
+            }
+
+            this.classList.add('flipped');
+            flippedCards.push(this);
+
+            if (flippedCards.length === 2) {
+                moves++;
+                movesEl.textContent = moves;
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
+            const isMatch = card1.dataset.suit === card2.dataset.suit && card1.dataset.value === card2.dataset.value;
+
+            if (isMatch) {
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                matchedCount += 2;
