@@ -10,14 +10,15 @@
             --bg-color: #fcf8ee;       /* 溫暖淡黃色背景 */
             --panel-bg: #ffffff;       /* 白色純淨看板 */
             --accent-color: #e2a04e;    /* 向日葵暖黃 */
-            --card-back: #d1c4e9;      /* 【更新】溫柔的淡紫色卡背 (Lavender) */
+            --card-back: #d1c4e9;      /* 溫柔的淡紫色卡背 (Lavender) */
             --card-front: #ffffff;     /* 卡片正面白色 */
+            --border-normal: #f0cb85;  /* 卡片未配對時的淡黃邊框 */
             --text-dark: #4a3e3d;      /* 繪本風深色文字 */
         }
 
         body {
             margin: 0;
-            padding: 20px;
+            padding: 15px;
             background-color: var(--bg-color);
             /* 微妙的暖黃色圓點裝飾 */
             background-image: radial-gradient(rgba(226, 160, 78, 0.12) 15%, transparent 16%);
@@ -29,36 +30,47 @@
             align-items: center;
         }
 
-        h1 {
-            margin-bottom: 10px;
-            color: var(--accent-color);
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+        /* 內容區塊主容器 */
+        .game-container {
+            max-width: 1000px; /* 【升級】加寬容器以容納 8 欄卡片 */
+            width: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* 儀表板資訊 */
+        h1 {
+            margin-bottom: 5px;
+            color: var(--accent-color);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+            align-self: center; /* 標題維持中央置中 */
+            font-size: 2rem;
+        }
+
+        /* 儀表板資訊：看板靠右 */
         .info-panel {
             display: flex;
             gap: 20px;
-            font-size: 1.2rem;
-            margin-bottom: 20px;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
             background: var(--panel-bg);
-            padding: 10px 20px;
+            padding: 8px 20px;
             border-radius: 50px;
             border: 2px solid #f0cb85;
             box-shadow: 0 4px 12px rgba(226, 160, 78, 0.1);
+            align-self: flex-end; 
         }
 
         .info-panel div {
             font-weight: 500;
         }
 
-        /* 遊戲主舞台 */
+        /* 遊戲主舞台：【核心修改】改為 8 欄網格，容納 32 張牌 */
         .game-board {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            max-width: 600px;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 10px;
             width: 100%;
+            margin-bottom: 20px;
         }
 
         /* 卡牌基礎樣式 */
@@ -75,7 +87,7 @@
             transform: rotateY(180deg);
         }
 
-        /* 配對成功後：保持正面花色朝上，維持原本清晰度，並鎖定點擊 */
+        /* 配對成功後：保持正面花色朝上，鎖定點擊 */
         .card.matched {
             cursor: default;
             pointer-events: none;
@@ -86,24 +98,24 @@
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
-            border-radius: 10px;
+            border-radius: 8px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 2rem;
+            font-size: 1.6rem;
             font-weight: bold;
-            box-shadow: 0 4px 8px rgba(74, 62, 61, 0.15);
+            box-shadow: 0 3px 6px rgba(74, 62, 61, 0.12);
         }
 
-        /* 卡背：高質感的淡紫色幾何線條紋路 */
+        /* 卡背：淡紫色幾何線條紋路 */
         .card-back {
             background-color: var(--card-back);
-            border: 5px solid white;
+            border: 4px solid white;
             box-sizing: border-box;
             background-image: radial-gradient(rgba(255,255,255,0.5) 15%, transparent 16%),
                               radial-gradient(rgba(255,255,255,0.5) 15%, transparent 16%);
-            background-size: 16px 16px;
-            background-position: 0 0, 8px 8px;
+            background-size: 14px 14px;
+            background-position: 0 0, 7px 7px;
         }
         .card:hover .card-back {
             border-color: #fff;
@@ -116,7 +128,7 @@
             transform: rotateY(180deg);
             flex-direction: column;
             justify-content: space-between;
-            padding: 10px;
+            padding: 6px;
             box-sizing: border-box;
             border: 1px solid #f0cb85;
         }
@@ -127,11 +139,11 @@
 
         .card-corner {
             align-self: flex-start;
-            font-size: 1.2rem;
+            font-size: 0.9rem;
             line-height: 1;
         }
         .card-center {
-            font-size: 3rem;
+            font-size: 2.2rem;
             line-height: 1;
         }
         .card-corner.bottom {
@@ -139,9 +151,8 @@
             transform: rotate(180deg);
         }
 
-        /* 按鈕樣式 */
+        /* 按鈕樣式：靠左排列 */
         .btn {
-            margin-top: 20px;
             padding: 12px 40px;
             font-size: 1.1rem;
             font-weight: bold;
@@ -153,36 +164,42 @@
             box-shadow: 0 4px 12px rgba(226, 160, 78, 0.2);
             transition: all 0.2s ease;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            align-self: flex-start; 
         }
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(226, 160, 78, 0.3);
         }
 
-        /* RWD 調整 */
-        @media (max-width: 480px) {
-            .game-board { gap: 8px; }
-            .card-face { font-size: 1.5rem; }
-            .card-center { font-size: 2rem; }
-            .card-corner { font-size: 0.9rem; }
+        /* RWD 行動裝置調整：寬度不夠時自動縮為 4 欄以利手機單手點擊 */
+        @media (max-width: 768px) {
+            .game-board { 
+                grid-template-columns: repeat(4, 1fr); 
+                gap: 8px;
+            }
+            .card-face { font-size: 1.3rem; }
+            .card-center { font-size: 1.8rem; }
+            .card-corner { font-size: 0.8rem; }
         }
     </style>
 </head>
 <body>
 
-    <h1>撲克牌記憶配對</h1>
-    
-    <div class="info-panel">
-        <div>時間: <span id="timer">0</span> 秒</div>
-        <div>翻牌次數: <span id="moves">0</span></div>
+    <div class="game-container">
+        <h1>撲克牌記憶配對</h1>
+        
+        <div class="info-panel">
+            <div>時間: <span id="timer">0</span> 秒</div>
+            <div>翻牌次數: <span id="moves">0</span></div>
+        </div>
+
+        <div class="game-board" id="board"></div>
+
+        <button class="btn" onclick="resetGame()">重新開始</button>
     </div>
 
-    <div class="game-board" id="board"></div>
-
-    <button class="btn" onclick="resetGame()">重新開始</button>
-
     <script>
-        // 定義遊戲所需的 8 對撲克牌（共 16 張）
+        // 【升級】定義擴充至 16 組不同的撲克牌型（共 32 張）
         const cardData = [
             { suit: '♠', value: 'A', color: 'black' },
             { suit: '♥', value: 'K', color: 'red' },
@@ -191,10 +208,19 @@
             { suit: '♠', value: '10', color: 'black' },
             { suit: '♥', value: '9', color: 'red' },
             { suit: '♦', value: '8', color: 'red' },
-            { suit: '♣', value: '7', color: 'black' }
+            { suit: '♣', value: '7', color: 'black' },
+            /* 新增 8 組 */
+            { suit: '♠', value: '2', color: 'black' },
+            { suit: '♥', value: '3', color: 'red' },
+            { suit: '♦', value: '4', color: 'red' },
+            { suit: '♣', value: '5', color: 'black' },
+            { suit: '♠', value: '6', color: 'black' },
+            { suit: '♥', value: '7', color: 'red' },
+            { suit: '♦', value: 'J', color: 'red' },
+            { suit: '♣', value: 'Q', color: 'black' }
         ];
 
-        // 複製成雙份
+        // 複製成雙份（共 32 張）
         let cards = [...cardData, ...cardData];
         
         let flippedCards = [];
@@ -285,38 +311,4 @@
             const isMatch = card1.dataset.suit === card2.dataset.suit && card1.dataset.value === card2.dataset.value;
 
             if (isMatch) {
-                // 成功時直接移除 flipped 並加上 matched，保持正面花色朝上，不變淡
                 card1.classList.remove('flipped');
-                card2.classList.remove('flipped');
-                card1.classList.add('matched');
-                card2.classList.add('matched');
-                
-                matchedCount += 2;
-                flippedCards = [];
-
-                // 檢查是否全破
-                if (matchedCount === cards.length) {
-                    clearInterval(timer);
-                    setTimeout(() => {
-                        alert(`恭喜通關！🎉\n總共花費了 ${seconds} 秒，翻牌次數：${moves} 次！`);
-                    }, 500);
-                }
-            } else {
-                // 配對失敗，0.8秒後翻回去
-                setTimeout(() => {
-                    card1.classList.remove('flipped');
-                    card2.classList.remove('flipped');
-                    flippedCards = [];
-                }, 800);
-            }
-        }
-
-        function resetGame() {
-            initGame();
-        }
-
-        // 網頁載入時啟動
-        initGame();
-    </script>
-</body>
-</html>
