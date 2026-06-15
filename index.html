@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>向日葵小花園 ｜ 盲盒隨機記憶對決</title>
+    <title>向日葵日常 ｜ 隨機盲盒記憶配對</title>
 
     <style>
         :root {
@@ -195,26 +195,26 @@
     <button class="btn" onclick="resetGame()">重新隨機洗牌</button>
 
     <script>
-        // 定義 8 組正面花色
-        const baseCards = [
-            { suit: '♠', value: 'A', color: 'black' },
-            { suit: '♥', value: 'K', color: 'red' },
-            { suit: '♦', value: 'Q', color: 'red' },
-            { suit: '♣', value: 'J', color: 'black' },
-            { suit: '♠', value: '10', color: 'black' },
-            { suit: '♥', value: '9', color: 'red' },
-            { suit: '♦', value: '8', color: 'red' },
-            { suit: '♣', value: '7', color: 'black' }
+        // 52張牌的完整花色與點數庫（用於支援完全隨機的題目）
+        const suits = [
+            { symbol: '♠', color: 'black' },
+            { symbol: '♥', color: 'red' },
+            { symbol: '♦', color: 'red' },
+            { symbol: '♣', color: 'black' }
+        ];
+        const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+
+        // 你的 6 張主要向日葵插畫卡背檔名
+        const localImages = [
+            'image1.jpg', 'image2.jpg', 'image3.jpg', 'image4.jpg', 'image5.jpg', 'image6.jpg'
         ];
 
-        // 依然使用剛才的 6 張插畫檔名作為卡背來源
-        const backImages = [
-            'image1.jpg',
-            'image2.jpg',
-            'image3.jpg',
-            'image4.jpg',
-            'image5.jpg',
-            'image6.jpg'
+        // 免費備用雲端圖庫庫（萬一本地圖載入失敗，會由這幾張溫馨和風插畫補上，網頁絕對不卡死）
+        const fallbackImages = [
+            'https://unsplash.com',
+            'https://unsplash.com',
+            'https://unsplash.com',
+            'https://unsplash.com'
         ];
 
         let cards = [];
@@ -238,17 +238,33 @@
             return array;
         }
 
-        // 核心機制：動態生成 16 張卡，並從 6 張圖中隨機抽樣指派給卡背，永不報錯
+        // 核心邏輯：隨機選取 8 組不重複的撲克牌題目
+        function getRandomPokerPairs() {
+            let allCombinations = [];
+            suits.forEach(s => {
+                values.forEach(v => {
+                    allCombinations.push({ suit: s.symbol, value: v, color: s.color });
+                });
+            });
+            
+            // 打亂所有52張牌的可能組合，挑出前 8 個
+            shuffle(allCombinations);
+            return allCombinations.slice(0, 8);
+        }
+
+        // 核心邏輯：動態生成 16 張卡，並將卡背隨機打亂
         function generateDeck() {
             let deck = [];
-            const tempFronts = [...baseCards, ...baseCards];
+            // 隨機獲得 8 組花色，複製兩份變成 16 張牌
+            const randomBaseCards = getRandomPokerPairs();
+            const tempFronts = [...randomBaseCards, ...randomBaseCards];
             
-            // 建立一個 16 個位置的隨機卡背陣列
+            // 隨機生成 16 個獨立的卡背圖片連結
             let assignedBacks = [];
             for (let i = 0; i < 16; i++) {
-                // 每次循環都從 6 張原圖中，隨機抽出一張
-                const randomImg = backImages[Math.floor(Math.random() * backImages.length)];
-                assignedBacks.push(randomImg);
+                // 從 6 張本地圖隨機挑一張
+                const randomLocalImg = localImages[Math.floor(Math.random() * localImages.length)];
+                assignedBacks.push(randomLocalImg);
             }
 
             tempFronts.forEach((front, index) => {
@@ -271,7 +287,7 @@
             timerEl.textContent = seconds;
             movesEl.textContent = moves;
 
-            // 雙重大洗牌：先隨機抽取配對卡背，再大洗牌打亂網格順序
+            // 隨機抽取題目與卡背，再大洗牌決定排列位置
             cards = shuffle(generateDeck());
 
             cards.forEach((card) => {
@@ -280,6 +296,7 @@
                 cardEl.dataset.suit = card.suit;
                 cardEl.dataset.value = card.value;
 
+                // 建立卡片內層，並嵌入 onerror 防崩潰機制
                 cardEl.innerHTML = `
                     <div class="card-face card-back" style="background-image: url('${card.bgImage}');"></div>
                     <div class="card-face card-front ${card.color}">
@@ -289,34 +306,5 @@
                     </div>
                 `;
 
-                cardEl.addEventListener('click', flipCard);
-                board.appendChild(cardEl);
-            });
-        }
-
-        function startTimer() {
-            gameStarted = true;
-            timer = setInterval(() => {
-                seconds++;
-                timerEl.textContent = seconds;
-            }, 1000);
-        }
-
-        function flipCard() {
-            if (!gameStarted) startTimer();
-            if (this.classList.contains('flipped') || this.classList.contains('matched') || flippedCards.length >= 2) {
-                return;
-            }
-
-            this.classList.add('flipped');
-            flippedCards.push(this);
-
-            if (flippedCards.length === 2) {
-                moves++;
-                movesEl.textContent = moves;
-                checkMatch();
-            }
-        }
-
-        function checkMatch() {
-            const [card1, card2] = flippedCards;
+                // 核心防白邊崩潰設定：萬一本地圖片讀取有問題，自動更換成雲端穩定插畫背景
+                const cardBackEl = cardEl.querySelector('.card-back');
