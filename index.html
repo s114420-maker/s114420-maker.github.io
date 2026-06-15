@@ -6,17 +6,24 @@
     <title>撲克牌記憶配對遊戲</title>
     <style>
         :root {
-            --bg-color: #2c3e50;
-            --card-back: #e74c3c;
-            --card-front: #ffffff;
+            /* 切換為舒適的淡黃色繪本風格配色 */
+            --bg-color: #fcf8ee;       /* 溫暖淡黃色背景 */
+            --panel-bg: #ffffff;       /* 白色純淨看板 */
+            --accent-color: #e2a04e;    /* 向日葵暖黃 */
+            --card-back: #e74c3c;      /* 經典紅色卡背 */
+            --card-front: #ffffff;     /* 卡片正面白色 */
+            --text-dark: #4a3e3d;      /* 繪本風深色文字 */
         }
 
         body {
             margin: 0;
             padding: 20px;
             background-color: var(--bg-color);
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            color: white;
+            /* 微妙的暖黃色圓點裝飾，讓淡黃色更有層次感 */
+            background-image: radial-gradient(rgba(226, 160, 78, 0.12) 15%, transparent 16%);
+            background-size: 24px 24px;
+            font-family: 'Helvetica Neue', Arial, 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            color: var(--text-dark);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -24,6 +31,8 @@
 
         h1 {
             margin-bottom: 10px;
+            color: var(--accent-color);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
         }
 
         /* 儀表板資訊 */
@@ -32,9 +41,15 @@
             gap: 20px;
             font-size: 1.2rem;
             margin-bottom: 20px;
-            background: rgba(0, 0, 0, 0.2);
+            background: var(--panel-bg);
             padding: 10px 20px;
-            border-radius: 8px;
+            border-radius: 50px;
+            border: 2px solid #f0cb85;
+            box-shadow: 0 4px 12px rgba(226, 160, 78, 0.1);
+        }
+
+        .info-panel div {
+            font-weight: 500;
         }
 
         /* 遊戲主舞台 */
@@ -78,7 +93,7 @@
             align-items: center;
             font-size: 2rem;
             font-weight: bold;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 8px rgba(74, 62, 61, 0.15);
         }
 
         /* 卡背 */
@@ -100,6 +115,7 @@
             justify-content: space-between;
             padding: 10px;
             box-sizing: border-box;
+            border: 1px solid #f0cb85;
         }
 
         /* 花色顏色調整 */
@@ -123,16 +139,22 @@
         /* 按鈕樣式 */
         .btn {
             margin-top: 20px;
-            padding: 10px 25px;
+            padding: 12px 40px;
             font-size: 1.1rem;
-            background-color: #2ecc71;
+            font-weight: bold;
+            background: linear-gradient(45deg, #f7d08a, var(--accent-color));
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 30px;
             cursor: pointer;
-            transition: background 0.2s;
+            box-shadow: 0 4px 12px rgba(226, 160, 78, 0.2);
+            transition: all 0.2s ease;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
-        .btn:hover { background-color: #27ae60; }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(226, 160, 78, 0.3);
+        }
 
         /* RWD 調整 */
         @media (max-width: 480px) {
