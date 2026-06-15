@@ -10,8 +10,8 @@
             --bg-color: #fcf8ee;       /* 溫暖淡黃色背景 */
             --panel-bg: #ffffff;       /* 白色純淨看板 */
             --accent-color: #e2a04e;    /* 向日葵暖黃 */
-            --card-back: #e74c3c;      /* 經典紅色卡背 */
             --card-front: #ffffff;     /* 卡片正面白色 */
+            --border-normal: #f0cb85;  /* 卡片未配對時的淡黃邊框 */
             --text-dark: #4a3e3d;      /* 繪本風深色文字 */
         }
 
@@ -19,6 +19,7 @@
             margin: 0;
             padding: 20px;
             background-color: var(--bg-color);
+            /* 微妙的暖黃色圓點裝飾，讓淡黃色更有層次感 */
             background-image: radial-gradient(rgba(226, 160, 78, 0.12) 15%, transparent 16%);
             background-size: 24px 24px;
             font-family: 'Helvetica Neue', Arial, 'PingFang TC', 'Microsoft JhengHei', sans-serif;
@@ -62,7 +63,7 @@
 
         /* 卡牌基礎樣式 */
         .card {
-            aspect-ratio: 2 / 3;
+            aspect-ratio: 2 / 3; /* 經典長方形撲克牌完美比例 */
             position: relative;
             transform-style: preserve-3d;
             transition: transform 0.6s;
@@ -74,7 +75,7 @@
             transform: rotateY(180deg);
         }
 
-        /* 【核心修改】配對成功後：保持正面花色朝上，維持原本清晰度，並鎖定點擊 */
+        /* 成功時：保持正面花色朝上，不變淡，鎖定點擊 */
         .card.matched {
             cursor: default;
             pointer-events: none;
@@ -94,15 +95,18 @@
             box-shadow: 0 4px 8px rgba(74, 62, 61, 0.15);
         }
 
-        /* 卡背 */
+        /* 卡背：使用你上傳的 6 張插畫圖片 */
         .card-back {
-            background-color: var(--card-back);
-            border: 5px solid white;
+            border: 4px solid white;
             box-sizing: border-box;
-            background-image: radial-gradient(rgba(255,255,255,0.3) 15%, transparent 16%),
-                              radial-gradient(rgba(255,255,255,0.3) 15%, transparent 16%);
-            background-size: 16px 16px;
-            background-position: 0 0, 8px 8px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #fff2da;
+            transition: border-color 0.2s;
+        }
+        .card:hover .card-back {
+            border-color: var(--accent-color);
         }
 
         /* 卡面 */
@@ -117,8 +121,8 @@
         }
 
         /* 花色顏色調整 */
-        .card-front.red { color: #e74c3c; }
-        .card-front.black { color: #2c3e50; }
+        .card-front.red { color: #de5d68; }
+        .card-front.black { color: #3d5a80; }
 
         .card-corner {
             align-self: flex-start;
@@ -177,7 +181,7 @@
     <button class="btn" onclick="resetGame()">重新開始</button>
 
     <script>
-        // 定義遊戲所需的 8 對撲克牌（共 16 張）
+        // 第一版固定的 8 組正面撲克牌型
         const cardData = [
             { suit: '♠', value: 'A', color: 'black' },
             { suit: '♥', value: 'K', color: 'red' },
@@ -189,9 +193,12 @@
             { suit: '♣', value: '7', color: 'black' }
         ];
 
-        // 複製成雙份
-        let cards = [...cardData, ...cardData];
-        
+        // 你的 6 張主要插畫卡背檔名
+        const backImages = [
+            'image1.jpg', 'image2.jpg', 'image3.jpg', 'image4.jpg', 'image5.jpg', 'image6.jpg'
+        ];
+
+        let cards = [];
         let flippedCards = [];
         let matchedCount = 0;
         let moves = 0;
@@ -203,13 +210,33 @@
         const timerEl = document.getElementById('timer');
         const movesEl = document.getElementById('moves');
 
-        // 洗牌演算法 (Fisher-Yates)
+        // 第一版洗牌演算法 (Fisher-Yates)
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [array[i], array[j]] = [array[j], array[i]];
             }
             return array;
+        }
+
+        // 動態配給 16 張卡片的卡背（從 6 張圖庫裡隨機抽樣，絕不報錯）
+        function generateDeck() {
+            let deck = [];
+            const tempFronts = [...cardData, ...cardData];
+            
+            let assignedBacks = [];
+            for (let i = 0; i < 16; i++) {
+                const randomImg = backImages[Math.floor(Math.random() * backImages.length)];
+                assignedBacks.push(randomImg);
+            }
+
+            tempFronts.forEach((front, index) => {
+                deck.push({
+                    ...front,
+                    bgImage: assignedBacks[index]
+                });
+            });
+            return deck;
         }
 
         // 初始化遊戲板
@@ -224,17 +251,17 @@
             timerEl.textContent = seconds;
             movesEl.textContent = moves;
 
-            const shuffledCards = shuffle([...cards]);
+            // 生成隨機卡背，並打亂卡牌在畫面上的排列位置
+            cards = shuffle(generateDeck());
 
-            shuffledCards.forEach((card, index) => {
+            cards.forEach((card) => {
                 const cardEl = document.createElement('div');
                 cardEl.classList.add('card');
-                cardEl.dataset.index = index;
                 cardEl.dataset.suit = card.suit;
                 cardEl.dataset.value = card.value;
 
                 cardEl.innerHTML = `
-                    <div class="card-face card-back"></div>
+                    <div class="card-face card-back" style="background-image: url('${card.bgImage}');"></div>
                     <div class="card-face card-front ${card.color}">
                         <div class="card-corner">${card.value}<br>${card.suit}</div>
                         <div class="card-center">${card.suit}</div>
@@ -260,7 +287,6 @@
         function flipCard() {
             if (!gameStarted) startTimer();
             
-            // 防止重複點擊已翻開、已配對的牌，或同時點擊超過兩張牌
             if (this.classList.contains('flipped') || this.classList.contains('matched') || flippedCards.length >= 2) {
                 return;
             }
@@ -281,7 +307,7 @@
             const isMatch = card1.dataset.suit === card2.dataset.suit && card1.dataset.value === card2.dataset.value;
 
             if (isMatch) {
-                // 【核心修改】成功時直接移除 flipped 並加上 matched，保持正面花色完全不變淡
+                // 成功時直接移除 flipped 並加上 matched，保持正面花色完全不變淡
                 card1.classList.remove('flipped');
                 card2.classList.remove('flipped');
                 card1.classList.add('matched');
@@ -294,25 +320,3 @@
                 if (matchedCount === cards.length) {
                     clearInterval(timer);
                     setTimeout(() => {
-                        alert(`恭喜通關！🎉\n總共花費了 ${seconds} 秒，翻牌次數：${moves} 次！`);
-                    }, 500);
-                }
-            } else {
-                // 配對失敗，0.8秒後翻回去
-                setTimeout(() => {
-                    card1.classList.remove('flipped');
-                    card2.classList.remove('flipped');
-                    flippedCards = [];
-                }, 800);
-            }
-        }
-
-        function resetGame() {
-            initGame();
-        }
-
-        // 網頁載入時啟動
-        initGame();
-    </script>
-</body>
-</html>
